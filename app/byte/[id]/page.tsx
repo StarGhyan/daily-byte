@@ -38,6 +38,7 @@ export default function BytePage({ params: _params }: any) {
     
     // Add a state to force a "redo" without clearing the global XP state.
     const [isRedoingActive, setIsRedoingActive] = useState<boolean>(false);
+    const [redoCount, setRedoCount] = useState<number>(0);
 
     const earnedXp = problems.reduce((s, _p, i) => {
         const sub = getSubmission(`${byteNum}-${i}`);
@@ -67,6 +68,7 @@ export default function BytePage({ params: _params }: any) {
         setShowExplanation(false);
         setShowHint(false);
         setHintConfirm(false);
+        setRedoCount(prev => prev + 1);
     };
 
     const handleHintClick = () => {
@@ -163,8 +165,8 @@ export default function BytePage({ params: _params }: any) {
     const globalSub = getSubmission(`${byteNum}-${activeIdx}`);
     const activeSub = isRedoingActive ? null : globalSub;
 
-    // Keys added with isRedoingActive prefix so we completely unmount/remount the quiz component when redoing
-    const componentKey = `${activeIdx}-${isRedoingActive ? "redo" : "normal"}`;
+    // Use redoCount to force a complete unmount/remount on redo
+    const componentKey = `${activeIdx}-${redoCount}`;
 
     return (
         <div>
@@ -222,7 +224,7 @@ export default function BytePage({ params: _params }: any) {
                     )}
                 </div>
                 
-                {activeSub && (
+                {activeSub && !isRedoingActive && (
                     <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
                         <button 
                             onClick={() => setShowExplanation(!showExplanation)} 

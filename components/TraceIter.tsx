@@ -15,16 +15,26 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
 
     const [answers, setAnswers] = useState<string[]>(() => {
         if (typeof window !== "undefined") {
-            const saved = sessionStorage.getItem(storageKey + "_ans");
-            if (saved) return JSON.parse(saved);
+            if (!submitted) {
+                // Fresh attempt or redo - clear previous save
+                sessionStorage.removeItem(storageKey + "_ans");
+                sessionStorage.removeItem(storageKey + "_corr");
+            } else {
+                const saved = sessionStorage.getItem(storageKey + "_ans");
+                if (saved) return JSON.parse(saved);
+            }
         }
         return Array(content.iterations.length).fill("");
     });
     
     const [correctness, setCorrectness] = useState<(boolean | null)[]>(() => {
         if (typeof window !== "undefined") {
-            const saved = sessionStorage.getItem(storageKey + "_corr");
-            if (saved) return JSON.parse(saved);
+            if (!submitted) {
+                // Already removed above, just return empty
+            } else {
+                const saved = sessionStorage.getItem(storageKey + "_corr");
+                if (saved) return JSON.parse(saved);
+            }
         }
         return Array(content.iterations.length).fill(null);
     });
