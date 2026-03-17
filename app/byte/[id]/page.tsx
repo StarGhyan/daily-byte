@@ -71,6 +71,7 @@ export default function BytePage({ params: _params }: any) {
         if (activeIdx === null) return;
         const key = `${byteNum}-${activeIdx}`;
         if (getSubmission(key) && !isRedoingActive) { setShowHint(true); return; }
+        if (isRedoingActive) { setShowHint(true); return; } // Free hint during redo
         setHintConfirm(true);
     };
 
@@ -143,7 +144,7 @@ export default function BytePage({ params: _params }: any) {
                                     </div>
                                     <div>
                                         {sub ? (
-                                            <span style={{ fontSize: 12, fontWeight: 600, color: sub.correct ? "var(--green)" : "var(--red)" }}>{sub.earned}/{p.xp} XP</span>
+                                            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--green)" }}>{sub.earned}/{p.xp} XP</span>
                                         ) : (
                                             <span style={{ fontSize: 13, color: "var(--accent)" }}>★ {p.xp}</span>
                                         )}
@@ -168,14 +169,6 @@ export default function BytePage({ params: _params }: any) {
         <div>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
                 <div onClick={closeProblem} style={{ color: "var(--text-dim)", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center" }}>← Back to menu</div>
-                <div style={{ display: "flex", gap: 8 }}>
-                    {activeIdx > 0 && (
-                        <button onClick={navigatePrev} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 6, padding: "6px 12px", color: "var(--text-muted)", fontSize: 12, cursor: "pointer" }}>← Previous</button>
-                    )}
-                    {(activeIdx < problems.length - 1 || hasNextByte) && (
-                        <button onClick={navigateNext} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 6, padding: "6px 12px", color: "var(--text)", fontSize: 12, cursor: "pointer" }}>Next →</button>
-                    )}
-                </div>
             </div>
             
             <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
@@ -199,7 +192,7 @@ export default function BytePage({ params: _params }: any) {
                 {p.type === "match_it" && <MatchIt key={componentKey} problem={p} onComplete={handleComplete} submitted={!!activeSub} />}
             </div>
 
-            {!showHint && !activeSub && (
+            {(!showHint && (!activeSub || isRedoingActive)) && (
                 <button onClick={handleHintClick} style={{ background: "none", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 8, padding: "8px 16px", color: "var(--amber)", fontSize: 12, cursor: "pointer", marginBottom: 16 }}>Show hint</button>
             )}
             {hintConfirm && (
@@ -224,22 +217,31 @@ export default function BytePage({ params: _params }: any) {
                 </div>
             )}
 
-            {activeSub && (
+            {(activeSub || isRedoingActive) && (
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 24 }}>
+                    {activeIdx > 0 && (
+                        <button onClick={navigatePrev} style={{ background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 16px", color: "var(--text)", fontSize: 12, cursor: "pointer" }}>← Previous</button>
+                    )}
                     <button 
                         onClick={() => setShowExplanation(!showExplanation)} 
                         style={{ background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 16px", color: "var(--text)", fontSize: 12, cursor: "pointer" }}
                     >
                         {showExplanation ? "Hide explanation" : "See explanation"}
                     </button>
-                    <button onClick={handleRedo} style={{ background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 16px", color: "var(--text)", fontSize: 12, cursor: "pointer" }}>
-                        Redo
-                    </button>
+                    {!isRedoingActive && (
+                        <button onClick={handleRedo} style={{ background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 16px", color: "var(--text)", fontSize: 12, cursor: "pointer" }}>
+                            Redo
+                        </button>
+                    )}
                     <button style={{ background: "var(--purple-dim)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: 8, padding: "10px 16px", color: "var(--purple)", fontSize: 12, cursor: "pointer" }}>
                         Discuss on Discord
                     </button>
+                    {(activeIdx < problems.length - 1 || hasNextByte) && (
+                        <button onClick={navigateNext} style={{ background: "var(--accent-dim)", border: "1px solid rgba(94,232,183,0.3)", borderRadius: 8, padding: "10px 16px", color: "var(--accent)", fontSize: 12, cursor: "pointer" }}>Next →</button>
+                    )}
                 </div>
             )}
         </div>
     );
-}
+}
+

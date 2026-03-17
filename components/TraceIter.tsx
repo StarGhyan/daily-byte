@@ -23,7 +23,7 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
     }, [currentIndex, submitted]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-        if (e.key === "Enter" && !submitted && correctness[index] === null) {
+        if (e.key === "Enter" && !submitted) {
             const isCorrect = answers[index].trim() === content.iterations[index].answer;
             
             setCorrectness(prev => {
@@ -33,7 +33,7 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
             });
 
             if (index < content.iterations.length - 1) {
-                setCurrentIndex(index + 1);
+                setCurrentIndex(Math.max(currentIndex, index + 1));
             } else {
                 let correctCount = (isCorrect ? 1 : 0);
                 for (let i = 0; i < index; i++) {
@@ -45,12 +45,19 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-        if (submitted || correctness[index] !== null) return;
+        if (submitted) return;
         setAnswers(prev => {
             const next = [...prev];
             next[index] = e.target.value;
             return next;
         });
+        if (correctness[index] !== null) {
+            setCorrectness(prev => {
+                const next = [...prev];
+                next[index] = null;
+                return next;
+            });
+        }
     };
 
     return (
@@ -91,7 +98,7 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
                                 value={answers[index]}
                                 onChange={(e) => handleChange(e, index)}
                                 onKeyDown={(e) => handleKeyDown(e, index)}
-                                disabled={submitted || index > currentIndex || correctness[index] !== null}
+                                disabled={submitted || index > currentIndex || correctness[index] === true}
                                 placeholder={isCurrent ? "..." : ""}
                                 style={{
                                     width: "60px",
@@ -113,9 +120,10 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
             </div>
             {!submitted && currentIndex < content.iterations.length && (
                 <div style={{ fontSize: "0.85rem", color: "var(--text-dim)" }}>
-                    Press <kbd style={{ background: "var(--border)", padding: "2px 6px", borderRadius: "4px", color: "var(--text)" }}>Enter</kbd> to submit your answer for the current iteration.
+                    Press <kbd style={{ background: "var(--border)", padding: "2px 6px", borderRadius: "4px", color: "var(--text)" }}>Enter</kbd> to submit your answer. Correct inputs are locked.
                 </div>
             )}
         </div>
     );
 }
+
