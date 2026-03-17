@@ -66,8 +66,15 @@ export function MatchIt({ problem, onComplete, submitted }: MatchItProps) {
                         const hasMatch = matchIndex !== undefined;
                         
                         let bg = "var(--bg-input)";
-                        let border = isSelected ? "var(--accent)" : "var(--border)";
+                        let border = "var(--border)";
                         let color = "var(--text)";
+
+                        if (isSelected) {
+                            bg = "rgba(96, 165, 250, 0.15)";
+                            border = "var(--blue)";
+                        } else if (hasMatch) {
+                            border = "rgba(94, 232, 183, 0.4)";
+                        }
 
                         if (submitted || evaluating) {
                             if (hasMatch) {
@@ -117,7 +124,11 @@ export function MatchIt({ problem, onComplete, submitted }: MatchItProps) {
                 {/* Complexities Column */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "1rem", flex: 1 }}>
                     {content.complexities.map((comp, index) => {
-                        let border = selectedAlgo !== null ? "var(--accent)" : "var(--border)";
+                        const isMatched = Object.values(matches).includes(index);
+                        
+                        let bg = isMatched ? "rgba(10, 14, 20, 0.5)" : "var(--bg-input)";
+                        let border = selectedAlgo !== null ? "var(--blue)" : "var(--border)";
+                        let color = isMatched ? "var(--text-dim)" : "var(--text)";
                         
                         return (
                             <button
@@ -126,10 +137,10 @@ export function MatchIt({ problem, onComplete, submitted }: MatchItProps) {
                                 disabled={submitted || evaluating || selectedAlgo === null}
                                 style={{
                                     padding: "1rem",
-                                    backgroundColor: "var(--bg-input)",
-                                    border: `1px solid ${selectedAlgo !== null ? "rgba(94, 232, 183, 0.4)" : "var(--border)"}`,
+                                    backgroundColor: bg,
+                                    border: `1px solid ${selectedAlgo !== null ? "rgba(96, 165, 250, 0.4)" : "var(--border)"}`,
                                     borderRadius: "8px",
-                                    color: "var(--text)",
+                                    color: color,
                                     textAlign: "center",
                                     cursor: (submitted || evaluating || selectedAlgo === null) ? "default" : "pointer",
                                     minHeight: "3.5rem",
@@ -139,8 +150,8 @@ export function MatchIt({ problem, onComplete, submitted }: MatchItProps) {
                                     outline: "none",
                                     transition: "all 0.2s"
                                 }}
-                                onMouseEnter={(e) => { if (!submitted && !evaluating && selectedAlgo !== null) e.currentTarget.style.borderColor = "var(--accent)"; }}
-                                onMouseLeave={(e) => { if (!submitted && !evaluating && selectedAlgo !== null) e.currentTarget.style.borderColor = "rgba(94, 232, 183, 0.4)"; }}
+                                onMouseEnter={(e) => { if (!submitted && !evaluating && selectedAlgo !== null) e.currentTarget.style.borderColor = "var(--blue)"; }}
+                                onMouseLeave={(e) => { if (!submitted && !evaluating && selectedAlgo !== null) e.currentTarget.style.borderColor = "rgba(96, 165, 250, 0.4)"; }}
                             >
                                 {comp}
                             </button>

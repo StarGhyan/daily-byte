@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import problemsData from "@/data/problems.json";
 import { Problem } from "@/lib/types";
@@ -25,6 +25,7 @@ const catBg: Record<string, string> = {
 
 export default function BytePage({ params: _params }: any) {
     const params = useParams();
+    const router = useRouter();
     const byteNum = Number(params.id);
     const problems = allProblems.filter((p) => p.byte === byteNum);
     const totalXp = problems.reduce((s, p) => s + p.xp, 0);
@@ -34,6 +35,9 @@ export default function BytePage({ params: _params }: any) {
     const [showHint, setShowHint] = useState(false);
     const [hintConfirm, setHintConfirm] = useState(false);
     const [showExplanation, setShowExplanation] = useState(false);
+    
+    // Add a state to force a "redo" without clearing the global XP state.
+    const [isRedoingActive, setIsRedoingActive] = useState<boolean>(false);
 
     const earnedXp = problems.reduce((s, _p, i) => {
         const sub = getSubmission(`${byteNum}-${i}`);
@@ -44,18 +48,29 @@ export default function BytePage({ params: _params }: any) {
         if (activeIdx === null) return;
         const p = problems[activeIdx];
         const key = `${byteNum}-${activeIdx}`;
-        if (getSubmission(key)) return;
+        
+        if (getSubmission(key)) {
+            // Already submitted globally. If they completed it in Redo mode, we stop redoing.
+            setIsRedoingActive(false);
+            return;
+        }
+
         const base = Math.floor(p.xp / 2);
         const correctBonus = Math.round((p.xp - base) * (correctCount / totalCount));
         const earned = base + correctBonus;
         submitProblem(key, { correct: correctCount === totalCount, earned });
-        setShowExplanation(true);
+        // Don't auto-show explanation
+    };
+
+    const handleRedo = () => {
+        setIsRedoingActive(true);
+        setShowExplanation(false);
     };
 
     const handleHintClick = () => {
         if (activeIdx === null) return;
         const key = `${byteNum}-${activeIdx}`;
-        if (getSubmission(key)) { setShowHint(true); return; }
+        if (getSubmission(key) && !isRedoingActive) { setShowHint(true); return; }
         setHintConfirm(true);
     };
 
@@ -69,8 +84,8 @@ export default function BytePage({ params: _params }: any) {
         setActiveIdx(idx);
         setShowHint(false);
         setHintConfirm(false);
-        const sub = getSubmission(`${byteNum}-${idx}`);
-        setShowExplanation(!!sub);
+        setShowExplanation(false);
+        setIsRedoingActive(false);
     };
 
     const closeProblem = () => {
@@ -78,6 +93,24 @@ export default function BytePage({ params: _params }: any) {
         setShowHint(false);
         setHintConfirm(false);
         setShowExplanation(false);
+        setIsRedoingActive(false);
+    };
+
+    const hasNextByte = allProblems.some(p => p.byte === byteNum + 1);
+
+    const navigateNext = () => {
+        if (activeIdx === null) return;
+        if (activeIdx < problems.length - 1) {
+            openProblem(activeIdx + 1);
+        } else if (hasNextByte) {
+            router.push(`/byte/${byteNum + 1}`);
+        }
+    };
+
+    const navigatePrev = () => {
+        if (activeIdx !== null && activeIdx > 0) {
+            openProblem(activeIdx - 1);
+        }
     };
 
     if (activeIdx === null) {
@@ -125,18 +158,33 @@ export default function BytePage({ params: _params }: any) {
     }
 
     const p = problems[activeIdx];
-    const sub = getSubmission(`${byteNum}-${activeIdx}`);
+    const globalSub = getSubmission(`${byteNum}-${activeIdx}`);
+    const activeSub = isRedoingActive ? null : globalSub;
+
+    // Keys added with isRedoingActive prefix so we completely unmount/remount the quiz component when redoing
+    const componentKey = `${activeIdx}-${isRedoingActive ? "redo" : "normal"}`;
 
     return (
         <div>
-            <div onClick={closeProblem} style={{ color: "var(--text-dim)", fontSize: 13, cursor: "pointer", marginBottom: 16 }}>← Back to menu</div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+                <div onClick={closeProblem} style={{ color: "var(--text-dim)", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center" }}>← Back to menu</div>
+                <div style={{ display: "flex", gap: 8 }}>
+                    {activeIdx > 0 && (
+                        <button onClick={navigatePrev} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 6, padding: "6px 12px", color: "var(--text-muted)", fontSize: 12, cursor: "pointer" }}>← Previous</button>
+                    )}
+                    {(activeIdx < problems.length - 1 || hasNextByte) && (
+                        <button onClick={navigateNext} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 6, padding: "6px 12px", color: "var(--text)", fontSize: 12, cursor: "pointer" }}>Next →</button>
+                    )}
+                </div>
+            </div>
+            
             <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
                 <span style={{ fontSize: 10, fontWeight: 600, color: catColor[p.category], background: catBg[p.category], padding: "2px 8px", borderRadius: 6 }}>{p.category}</span>
             </div>
             <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>{p.title}</h2>
             <p style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 4 }}>{p.course}</p>
             <p style={{ fontSize: 13, color: "var(--accent)", marginBottom: 20 }}>
-                {sub ? `${sub.earned}/${p.xp} XP earned` : `★ ${p.xp} XP`}
+                {globalSub ? `${globalSub.earned}/${p.xp} XP earned` : `★ ${p.xp} XP`}
             </p>
 
             <details style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 16px", marginBottom: 20 }}>
@@ -145,13 +193,13 @@ export default function BytePage({ params: _params }: any) {
             </details>
 
             <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, marginBottom: 16 }}>
-                {p.type === "spot_it" && <SpotIt key={activeIdx} problem={p} onComplete={handleComplete} submitted={!!sub} />}
-                {p.type === "sort_code" && <SortCode key={activeIdx} problem={p} onComplete={handleComplete} submitted={!!sub} />}
-                {p.type === "trace_iter" && <TraceIter key={activeIdx} problem={p} onComplete={handleComplete} submitted={!!sub} />}
-                {p.type === "match_it" && <MatchIt key={activeIdx} problem={p} onComplete={handleComplete} submitted={!!sub} />}
+                {p.type === "spot_it" && <SpotIt key={componentKey} problem={p} onComplete={handleComplete} submitted={!!activeSub} />}
+                {p.type === "sort_code" && <SortCode key={componentKey} problem={p} onComplete={handleComplete} submitted={!!activeSub} />}
+                {p.type === "trace_iter" && <TraceIter key={componentKey} problem={p} onComplete={handleComplete} submitted={!!activeSub} />}
+                {p.type === "match_it" && <MatchIt key={componentKey} problem={p} onComplete={handleComplete} submitted={!!activeSub} />}
             </div>
 
-            {!showHint && !sub && (
+            {!showHint && !activeSub && (
                 <button onClick={handleHintClick} style={{ background: "none", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 8, padding: "8px 16px", color: "var(--amber)", fontSize: 12, cursor: "pointer", marginBottom: 16 }}>Show hint</button>
             )}
             {hintConfirm && (
@@ -167,26 +215,31 @@ export default function BytePage({ params: _params }: any) {
                 <div style={{ background: "var(--amber-dim)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 10, padding: 14, marginBottom: 16, fontSize: 13, color: "var(--amber)", lineHeight: 1.6 }}>{p.hint}</div>
             )}
 
-            {showExplanation && sub && (
-                <div style={{ background: sub.correct ? "var(--green-bg)" : "var(--red-bg)", border: `1px solid ${sub.correct ? "rgba(74,222,128,0.3)" : "rgba(248,113,113,0.3)"}`, borderRadius: 12, padding: 16, marginBottom: 16 }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: sub.correct ? "var(--green)" : "var(--red)", marginBottom: 8 }}>
-                        {sub.correct ? "Correct!" : "Not quite right"} — {sub.earned}/{p.xp} XP
+            {showExplanation && activeSub && (
+                <div style={{ background: activeSub.correct ? "var(--green-bg)" : "var(--red-bg)", border: `1px solid ${activeSub.correct ? "rgba(74,222,128,0.3)" : "rgba(248,113,113,0.3)"}`, borderRadius: 12, padding: 16, marginBottom: 16 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: activeSub.correct ? "var(--green)" : "var(--red)", marginBottom: 8 }}>
+                        {activeSub.correct ? "Correct!" : "Not quite right"} — {activeSub.earned}/{p.xp} XP
                     </div>
                     <p style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.7 }}>{p.explanation}</p>
                 </div>
             )}
 
-            {sub && (
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                    <button style={{ background: "var(--purple-dim)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: 8, padding: "10px 16px", color: "var(--purple)", fontSize: 12, cursor: "pointer" }}>Discuss on Discord</button>
-                    {activeIdx > 0 && (
-                        <button onClick={() => openProblem(activeIdx - 1)} style={{ background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 16px", color: "var(--text-muted)", fontSize: 12, cursor: "pointer" }}>← Previous</button>
-                    )}
-                    {activeIdx < problems.length - 1 && (
-                        <button onClick={() => openProblem(activeIdx + 1)} style={{ background: "var(--accent-dim)", border: "1px solid rgba(94,232,183,0.3)", borderRadius: 8, padding: "10px 16px", color: "var(--accent)", fontSize: 12, cursor: "pointer" }}>Next question →</button>
-                    )}
+            {activeSub && (
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 24 }}>
+                    <button 
+                        onClick={() => setShowExplanation(!showExplanation)} 
+                        style={{ background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 16px", color: "var(--text)", fontSize: 12, cursor: "pointer" }}
+                    >
+                        {showExplanation ? "Hide explanation" : "See explanation"}
+                    </button>
+                    <button onClick={handleRedo} style={{ background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 16px", color: "var(--text)", fontSize: 12, cursor: "pointer" }}>
+                        Redo
+                    </button>
+                    <button style={{ background: "var(--purple-dim)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: 8, padding: "10px 16px", color: "var(--purple)", fontSize: 12, cursor: "pointer" }}>
+                        Discuss on Discord
+                    </button>
                 </div>
             )}
         </div>
     );
-}
+}
