@@ -126,28 +126,45 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
                     return (
                         <div key={index} style={{ display: "flex", flexDirection: "column", gap: "0.5rem", alignItems: "center" }}>
                             <span style={{ fontSize: "0.85rem", color: "var(--text-dim)", fontWeight: "600" }}>{iter.label}</span>
-                            <input
-                                ref={(el) => { inputRefs.current[index] = el; }}
-                                type="text"
-                                value={answers[index]}
-                                onChange={(e) => handleChange(e, index)}
-                                onKeyDown={(e) => handleKeyDown(e, index)}
-                                disabled={submitted || index > currentIndex || correctness[index] === true}
-                                placeholder={isCurrent ? "..." : ""}
-                                style={{
+                            {isCurrent ? (
+                                <input
+                                    ref={(el) => { inputRefs.current[index] = el; }}
+                                    type="text"
+                                    value={answers[index]}
+                                    onChange={(e) => handleChange(e, index)}
+                                    onKeyDown={(e) => handleKeyDown(e, index)}
+                                    placeholder="..."
+                                    style={{
+                                        width: "60px",
+                                        height: "40px",
+                                        textAlign: "center",
+                                        backgroundColor: bg,
+                                        border: "1px solid var(--accent)",
+                                        borderRadius: "8px",
+                                        color: color,
+                                        fontSize: "1rem",
+                                        outline: "none",
+                                        fontFamily: "inherit",
+                                        transition: "all 0.2s"
+                                    }}
+                                />
+                            ) : (
+                                <div style={{
                                     width: "60px",
                                     height: "40px",
-                                    textAlign: "center",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
                                     backgroundColor: bg,
-                                    border: `1px solid ${isCurrent ? "var(--accent)" : border}`,
+                                    border: `1px solid ${border}`,
                                     borderRadius: "8px",
                                     color: color,
                                     fontSize: "1rem",
-                                    outline: "none",
-                                    fontFamily: "inherit",
-                                    transition: "all 0.2s"
-                                }}
-                            />
+                                    fontFamily: "inherit"
+                                }}>
+                                    {(submitted || index < currentIndex || correctness[index] !== null) ? answers[index] : "?"}
+                                </div>
+                            )}
                         </div>
                     );
                 })}

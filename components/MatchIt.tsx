@@ -42,7 +42,7 @@ export function MatchIt({ problem, onComplete, submitted }: MatchItProps) {
 
         content.algorithms.forEach((algo, index) => {
             const matchedCompIndex = matches[index];
-            const correctCompIndex = content.correct[algo];
+            const correctCompIndex = content.correct[String(index)];
             if (matchedCompIndex === correctCompIndex) {
                 correctCount++;
             }
@@ -78,7 +78,7 @@ export function MatchIt({ problem, onComplete, submitted }: MatchItProps) {
 
                         if (submitted || evaluating) {
                             if (hasMatch) {
-                                const isCorrect = matchIndex === content.correct[algo];
+                                const isCorrect = matchIndex === content.correct[String(index)];
                                 if (isCorrect) {
                                     bg = "var(--green-bg)"; border = "var(--green)"; color = "var(--green)";
                                 } else {
