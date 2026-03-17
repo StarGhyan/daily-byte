@@ -210,9 +210,6 @@ export default function BytePage({ params: _params }: any) {
 
             {showExplanation && activeSub && (
                 <div style={{ background: activeSub.correct ? "var(--green-bg)" : "var(--red-bg)", border: `1px solid ${activeSub.correct ? "rgba(74,222,128,0.3)" : "rgba(248,113,113,0.3)"}`, borderRadius: 12, padding: 16, marginBottom: 16 }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: activeSub.correct ? "var(--green)" : "var(--red)", marginBottom: 8 }}>
-                        {activeSub.correct ? "Correct!" : "Not quite right"} — {activeSub.earned}/{p.xp} XP
-                    </div>
                     <p style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.7 }}>{p.explanation}</p>
                 </div>
             )}

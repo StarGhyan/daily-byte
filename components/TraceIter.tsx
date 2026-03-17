@@ -11,10 +11,34 @@ interface TraceIterProps {
 
 export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
     const content = problem.content as TraceIterContent;
-    const [answers, setAnswers] = useState<string[]>(Array(content.iterations.length).fill(""));
-    const [correctness, setCorrectness] = useState<(boolean | null)[]>(Array(content.iterations.length).fill(null));
+    const storageKey = `trace_iter_${problem.byte}_${problem.title.replace(/\s+/g, '')}`;
+
+    const [answers, setAnswers] = useState<string[]>(() => {
+        if (typeof window !== "undefined") {
+            const saved = sessionStorage.getItem(storageKey + "_ans");
+            if (saved) return JSON.parse(saved);
+        }
+        return Array(content.iterations.length).fill("");
+    });
+    
+    const [correctness, setCorrectness] = useState<(boolean | null)[]>(() => {
+        if (typeof window !== "undefined") {
+            const saved = sessionStorage.getItem(storageKey + "_corr");
+            if (saved) return JSON.parse(saved);
+        }
+        return Array(content.iterations.length).fill(null);
+    });
+    
     const [currentIndex, setCurrentIndex] = useState(0);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+    useEffect(() => {
+        sessionStorage.setItem(storageKey + "_ans", JSON.stringify(answers));
+    }, [answers, storageKey]);
+
+    useEffect(() => {
+        sessionStorage.setItem(storageKey + "_corr", JSON.stringify(correctness));
+    }, [correctness, storageKey]);
 
     useEffect(() => {
         if (!submitted && currentIndex < content.iterations.length) {
