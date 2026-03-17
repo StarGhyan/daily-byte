@@ -38,8 +38,16 @@ export function XpProvider({ children }: { children: ReactNode }) {
     );
 }
 
+const defaultState: XpState = {
+    xp: 0,
+    submissions: {},
+    addXp: () => { },
+    removeXp: () => { },
+    submitProblem: () => { },
+    getSubmission: () => undefined,
+};
+
 export function useXp() {
     const ctx = useContext(XpContext);
-    if (!ctx) throw new Error("useXp must be used within XpProvider");
-    return ctx;
+    return ctx || defaultState;
 }
