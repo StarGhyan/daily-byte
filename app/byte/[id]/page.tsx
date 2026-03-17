@@ -5,6 +5,10 @@ import Link from "next/link";
 import problemsData from "@/data/problems.json";
 import { Problem } from "@/lib/types";
 import { useXp } from "@/lib/xp-context";
+import { SpotIt } from "@/components/SpotIt";
+import { SortCode } from "@/components/SortCode";
+import { TraceIter } from "@/components/TraceIter";
+import { MatchIt } from "@/components/MatchIt";
 
 const allProblems = problemsData as Problem[];
 
@@ -19,7 +23,7 @@ const catBg: Record<string, string> = {
     "Interview prep": "var(--coral-dim)",
 };
 
-export default function BytePage() {
+export default function BytePage({ params: _params }: any) {
     const params = useParams();
     const byteNum = Number(params.id);
     const problems = allProblems.filter((p) => p.byte === byteNum);
@@ -141,7 +145,10 @@ export default function BytePage() {
             </details>
 
             <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, marginBottom: 16 }}>
-                <p style={{ color: "var(--text-dim)", fontSize: 13 }}>Question component for "{p.type}" goes here</p>
+                {p.type === "spot_it" && <SpotIt key={activeIdx} problem={p} onComplete={handleComplete} submitted={!!sub} />}
+                {p.type === "sort_code" && <SortCode key={activeIdx} problem={p} onComplete={handleComplete} submitted={!!sub} />}
+                {p.type === "trace_iter" && <TraceIter key={activeIdx} problem={p} onComplete={handleComplete} submitted={!!sub} />}
+                {p.type === "match_it" && <MatchIt key={activeIdx} problem={p} onComplete={handleComplete} submitted={!!sub} />}
             </div>
 
             {!showHint && !sub && (
