@@ -29,7 +29,7 @@ export default function BytePage({ params: _params }: any) {
     const byteNum = Number(params.id);
     const problems = allProblems.filter((p) => p.byte === byteNum);
     const totalXp = problems.reduce((s, p) => s + p.xp, 0);
-    const { submitProblem, getSubmission, removeXp } = useXp();
+    const { submitProblem, getSubmission, removeXp, saveProgress } = useXp();
 
     const [activeIdx, setActiveIdx] = useState<number | null>(null);
     const [showHint, setShowHint] = useState(false);
@@ -64,6 +64,13 @@ export default function BytePage({ params: _params }: any) {
     };
 
     const handleRedo = () => {
+        if (activeIdx === null) return;
+        const prob = problems[activeIdx];
+        const titleKey = prob.title.replace(/\s+/g, "");
+        // Clear any saved partial progress for this problem
+        saveProgress(`trace-${prob.byte}-${titleKey}`, undefined);
+        saveProgress(`sort-${prob.byte}-${titleKey}`, undefined);
+        saveProgress(`match-${prob.byte}-${titleKey}`, undefined);
         setIsRedoingActive(true);
         setShowExplanation(false);
         setShowHint(false);
@@ -167,7 +174,6 @@ export default function BytePage({ params: _params }: any) {
 
     const p = problems[activeIdx];
     const globalSub = getSubmission(`${byteNum}-${activeIdx}`);
-    const activeSub = isRedoingActive ? null : globalSub;
 
     // Use redoCount to force a complete unmount/remount on redo
     const componentKey = `${activeIdx}-${redoCount}`;
@@ -193,10 +199,10 @@ export default function BytePage({ params: _params }: any) {
             </details>
 
             <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, marginBottom: 16 }}>
-                {p.type === "spot_it" && <SpotIt key={componentKey} problem={p} onComplete={handleComplete} submitted={!!activeSub} />}
-                {p.type === "sort_code" && <SortCode key={componentKey} problem={p} onComplete={handleComplete} submitted={!!activeSub} />}
-                {p.type === "trace_iter" && <TraceIter key={componentKey} problem={p} onComplete={handleComplete} submitted={!!activeSub} />}
-                {p.type === "match_it" && <MatchIt key={componentKey} problem={p} onComplete={handleComplete} submitted={!!activeSub} />}
+                {p.type === "spot_it" && <SpotIt key={componentKey} problem={p} onComplete={handleComplete} submitted={isRedoingActive ? false : !!globalSub} />}
+                {p.type === "sort_code" && <SortCode key={componentKey} problem={p} onComplete={handleComplete} submitted={isRedoingActive ? false : !!globalSub} />}
+                {p.type === "trace_iter" && <TraceIter key={componentKey} problem={p} onComplete={handleComplete} submitted={isRedoingActive ? false : !!globalSub} />}
+                {p.type === "match_it" && <MatchIt key={componentKey} problem={p} onComplete={handleComplete} submitted={isRedoingActive ? false : !!globalSub} />}
             </div>
 
             {!showHint && !hintConfirm && (
@@ -216,7 +222,7 @@ export default function BytePage({ params: _params }: any) {
             )}
 
             {showExplanation && globalSub && (
-                <div style={{ background: activeSub?.correct ?? true ? "var(--green-bg)" : "var(--red-bg)", border: `1px solid ${activeSub?.correct ?? true ? "rgba(74,222,128,0.3)" : "rgba(248,113,113,0.3)"}`, borderRadius: 12, padding: 16, marginBottom: 16 }}>
+                <div style={{ background: globalSub?.correct ? "var(--green-bg)" : "var(--red-bg)", border: `1px solid ${globalSub?.correct ? "rgba(74,222,128,0.3)" : "rgba(248,113,113,0.3)"}`, borderRadius: 12, padding: 16, marginBottom: 16 }}>
                     <p style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.7 }}>{p.explanation}</p>
                 </div>
             )}
