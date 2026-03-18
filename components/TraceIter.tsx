@@ -135,7 +135,6 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
                                     value={answers[index]}
                                     onChange={(e) => handleChange(e, index)}
                                     onKeyDown={(e) => handleKeyDown(e, index)}
-                                    placeholder="..."
                                     maxLength={iter.answer.length + 2}
                                     style={{
                                         width: "60px",
@@ -163,7 +162,9 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
                                     borderRadius: "8px",
                                     color: color,
                                     fontSize: "1rem",
-                                    fontFamily: "inherit"
+                                    fontFamily: "inherit",
+                                    userSelect: "none",
+                                    cursor: "default"
                                 }}>
                                     {(submitted || index < currentIndex || correctness[index] !== null) ? answers[index] : "?"}
                                 </div>
