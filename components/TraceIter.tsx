@@ -9,46 +9,84 @@ interface TraceIterProps {
     submitted: boolean;
 }
 
+function lsGet<T>(key: string, fallback: T): T {
+    if (typeof window === "undefined") return fallback;
+    try {
+        const raw = localStorage.getItem(key);
+        if (raw === null) return fallback;
+        return JSON.parse(raw) as T;
+    } catch {
+        return fallback;
+    }
+}
+
+function lsSet(key: string, value: unknown) {
+    if (typeof window === "undefined") return;
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* ignore */ }
+}
+
+function lsRemove(key: string) {
+    if (typeof window === "undefined") return;
+    try { localStorage.removeItem(key); } catch { /* ignore */ }
+}
+
 export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
     const content = problem.content as TraceIterContent;
-    const storageKey = `trace_iter_${problem.byte}_${problem.title.replace(/\s+/g, '')}`;
+    const ansKey = `dailybyte-trace-${problem.byte}-${problem.title.replace(/\s+/g, "")}-ans`;
+    const corrKey = `dailybyte-trace-${problem.byte}-${problem.title.replace(/\s+/g, "")}-corr`;
+    const idxKey  = `dailybyte-trace-${problem.byte}-${problem.title.replace(/\s+/g, "")}-idx`;
 
     const [answers, setAnswers] = useState<string[]>(() => {
-        if (typeof window !== "undefined") {
-            if (!submitted) {
-                // Fresh attempt or redo - clear previous save
-                sessionStorage.removeItem(storageKey + "_ans");
-                sessionStorage.removeItem(storageKey + "_corr");
-            } else {
-                const saved = sessionStorage.getItem(storageKey + "_ans");
-                if (saved) return JSON.parse(saved);
-            }
-        }
-        return Array(content.iterations.length).fill("");
+        // If already submitted (view after page refresh), restore saved answers
+        if (submitted) return lsGet<string[]>(ansKey, Array(content.iterations.length).fill(""));
+        // Active in-progress session: restore partial progress
+        return lsGet<string[]>(ansKey, Array(content.iterations.length).fill(""));
     });
-    
+
     const [correctness, setCorrectness] = useState<(boolean | null)[]>(() => {
-        if (typeof window !== "undefined") {
-            if (!submitted) {
-                // Already removed above, just return empty
-            } else {
-                const saved = sessionStorage.getItem(storageKey + "_corr");
-                if (saved) return JSON.parse(saved);
-            }
-        }
-        return Array(content.iterations.length).fill(null);
+        if (submitted) return lsGet<(boolean | null)[]>(corrKey, Array(content.iterations.length).fill(null));
+        return lsGet<(boolean | null)[]>(corrKey, Array(content.iterations.length).fill(null));
     });
-    
-    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const [currentIndex, setCurrentIndex] = useState<number>(() => {
+        if (submitted) return lsGet<number>(idxKey, 0);
+        return lsGet<number>(idxKey, 0);
+    });
+
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+    // On unmount while not submitted (e.g. redo or navigation), clear saved progress
+    // so the next mount starts fresh. Page refresh doesn't reliably fire this cleanup,
+    // so localStorage survives a refresh and partial progress is restored.
     useEffect(() => {
-        sessionStorage.setItem(storageKey + "_ans", JSON.stringify(answers));
-    }, [answers, storageKey]);
+        return () => {
+            if (!submitted) {
+                lsRemove(ansKey);
+                lsRemove(corrKey);
+                lsRemove(idxKey);
+            }
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Persist partial answers on every change (skip if submitted — answers are already final)
+    useEffect(() => {
+        if (!submitted) {
+            lsSet(ansKey, answers);
+        }
+    }, [answers, ansKey, submitted]);
 
     useEffect(() => {
-        sessionStorage.setItem(storageKey + "_corr", JSON.stringify(correctness));
-    }, [correctness, storageKey]);
+        if (!submitted) {
+            lsSet(corrKey, correctness);
+        }
+    }, [correctness, corrKey, submitted]);
+
+    useEffect(() => {
+        if (!submitted) {
+            lsSet(idxKey, currentIndex);
+        }
+    }, [currentIndex, idxKey, submitted]);
 
     useEffect(() => {
         if (!submitted && currentIndex < content.iterations.length) {
@@ -56,10 +94,16 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
         }
     }, [currentIndex, submitted]);
 
+    const clearSaved = () => {
+        lsRemove(ansKey);
+        lsRemove(corrKey);
+        lsRemove(idxKey);
+    };
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
         if (e.key === "Enter" && !submitted) {
             const isCorrect = answers[index].trim() === content.iterations[index].answer;
-            
+
             setCorrectness(prev => {
                 const next = [...prev];
                 next[index] = isCorrect;
@@ -69,6 +113,8 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
             if (index < content.iterations.length - 1) {
                 setCurrentIndex(Math.max(currentIndex, index + 1));
             } else {
+                // All done — clear saved partial progress
+                clearSaved();
                 let correctCount = (isCorrect ? 1 : 0);
                 for (let i = 0; i < index; i++) {
                     if (correctness[i]) correctCount++;
