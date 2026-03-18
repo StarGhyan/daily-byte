@@ -100,6 +100,7 @@ export default function BytePage({ params: _params }: any) {
         setIsRedoingActive(false);
     };
 
+    const hasPrevByte = allProblems.some(p => p.byte === byteNum - 1);
     const hasNextByte = allProblems.some(p => p.byte === byteNum + 1);
 
     const navigateNext = () => {
@@ -112,8 +113,11 @@ export default function BytePage({ params: _params }: any) {
     };
 
     const navigatePrev = () => {
-        if (activeIdx !== null && activeIdx > 0) {
+        if (activeIdx === null) return;
+        if (activeIdx > 0) {
             openProblem(activeIdx - 1);
+        } else if (hasPrevByte) {
+            router.push(`/byte/${byteNum - 1}`);
         }
     };
 
@@ -219,8 +223,10 @@ export default function BytePage({ params: _params }: any) {
 
             <div style={{ display: "flex", width: "100%", marginTop: 24, alignItems: "center", flexWrap: "wrap", gap: "12px 0" }}>
                 <div style={{ flex: 1, minWidth: "max-content" }}>
-                    {activeIdx > 0 && (
-                        <button onClick={navigatePrev} style={{ background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 16px", color: "var(--text)", fontSize: 12, cursor: "pointer" }}>← Previous</button>
+                    {(activeIdx > 0 || hasPrevByte) && (
+                        <button onClick={navigatePrev} style={{ background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 16px", color: "var(--text)", fontSize: 12, cursor: "pointer" }}>
+                            {activeIdx === 0 ? `← Byte #${byteNum - 1}` : "← Previous"}
+                        </button>
                     )}
                 </div>
                 
@@ -248,7 +254,9 @@ export default function BytePage({ params: _params }: any) {
                 
                 <div style={{ flex: 1, display: "flex", justifyContent: "flex-end", minWidth: "max-content" }}>
                     {(activeIdx < problems.length - 1 || hasNextByte) && (
-                        <button onClick={navigateNext} style={{ background: "var(--accent-dim)", border: "1px solid rgba(94,232,183,0.3)", borderRadius: 8, padding: "10px 16px", color: "var(--accent)", fontSize: 12, cursor: "pointer" }}>Next →</button>
+                        <button onClick={navigateNext} style={{ background: "var(--accent-dim)", border: "1px solid rgba(94,232,183,0.3)", borderRadius: 8, padding: "10px 16px", color: "var(--accent)", fontSize: 12, cursor: "pointer" }}>
+                            {activeIdx === problems.length - 1 ? `Byte #${byteNum + 1} →` : "Next →"}
+                        </button>
                     )}
                 </div>
             </div>
