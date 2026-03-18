@@ -45,6 +45,30 @@ export function SortCode({ problem, onComplete, submitted }: SortCodeProps) {
         }
     };
 
+    const handleMoveUp = (index: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (submitted || evaluating || index === 0) return;
+        setLineOrder(prev => {
+            const next = [...prev];
+            [next[index - 1], next[index]] = [next[index], next[index - 1]];
+            return next;
+        });
+        if (selectedLineIndex === index) setSelectedLineIndex(index - 1);
+        else if (selectedLineIndex === index - 1) setSelectedLineIndex(index);
+    };
+
+    const handleMoveDown = (index: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (submitted || evaluating || index === lineOrder.length - 1) return;
+        setLineOrder(prev => {
+            const next = [...prev];
+            [next[index], next[index + 1]] = [next[index + 1], next[index]];
+            return next;
+        });
+        if (selectedLineIndex === index) setSelectedLineIndex(index + 1);
+        else if (selectedLineIndex === index + 1) setSelectedLineIndex(index);
+    };
+
     const handleCheckOrder = () => {
         if (submitted || evaluating) return;
         setEvaluating(true);
@@ -90,6 +114,20 @@ export function SortCode({ problem, onComplete, submitted }: SortCodeProps) {
                         border = "var(--blue)";
                     }
 
+                    const arrowDisabled = submitted || evaluating;
+                    const arrowBase: React.CSSProperties = {
+                        background: "none",
+                        border: "none",
+                        padding: "0 2px",
+                        lineHeight: 1,
+                        fontSize: "0.7rem",
+                        cursor: arrowDisabled ? "default" : "pointer",
+                        color: "var(--text-dim)",
+                        opacity: arrowDisabled ? 0.3 : 0.55,
+                        flexShrink: 0,
+                        transition: "opacity 0.15s",
+                    };
+
                     return (
                         <div 
                             key={originalIndex} 
@@ -97,17 +135,41 @@ export function SortCode({ problem, onComplete, submitted }: SortCodeProps) {
                             style={{ 
                                 display: "flex", 
                                 alignItems: "center", 
-                                gap: "1rem", 
+                                gap: "0.5rem", 
                                 backgroundColor: bg, 
                                 border: `1px solid ${border}`, 
                                 borderRadius: "8px", 
-                                padding: "0.75rem", 
+                                padding: "0.6rem 0.75rem", 
                                 color: color, 
                                 transition: "all 0.2s ease",
                                 cursor: (submitted || evaluating) ? "default" : "pointer",
                                 userSelect: "none"
                             }}
                         >
+                            {/* Arrow buttons */}
+                            <div style={{ display: "flex", flexDirection: "column", gap: "1px", flexShrink: 0 }}>
+                                <button
+                                    onClick={(e) => handleMoveUp(currentIndex, e)}
+                                    disabled={arrowDisabled || currentIndex === 0}
+                                    title="Move up"
+                                    style={{
+                                        ...arrowBase,
+                                        opacity: (arrowDisabled || currentIndex === 0) ? 0.2 : 0.55,
+                                        cursor: (arrowDisabled || currentIndex === 0) ? "default" : "pointer",
+                                    }}
+                                >▲</button>
+                                <button
+                                    onClick={(e) => handleMoveDown(currentIndex, e)}
+                                    disabled={arrowDisabled || currentIndex === lineOrder.length - 1}
+                                    title="Move down"
+                                    style={{
+                                        ...arrowBase,
+                                        opacity: (arrowDisabled || currentIndex === lineOrder.length - 1) ? 0.2 : 0.55,
+                                        cursor: (arrowDisabled || currentIndex === lineOrder.length - 1) ? "default" : "pointer",
+                                    }}
+                                >▼</button>
+                            </div>
+                            {/* Line number */}
                             <div style={{ color: "var(--text-dim)", fontSize: "0.85rem", minWidth: "1.5rem", textAlign: "center", flexShrink: 0 }}>
                                 {currentIndex + 1}
                             </div>
