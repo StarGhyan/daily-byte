@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Problem, TraceIterContent } from "@/lib/types";
+import { useXp } from "@/lib/xp-context";
 
 interface TraceIterProps {
     problem: Problem;
@@ -9,96 +10,43 @@ interface TraceIterProps {
     submitted: boolean;
 }
 
-function lsGet<T>(key: string, fallback: T): T {
-    if (typeof window === "undefined") return fallback;
-    try {
-        const raw = localStorage.getItem(key);
-        if (raw === null) return fallback;
-        return JSON.parse(raw) as T;
-    } catch {
-        return fallback;
-    }
-}
-
-function lsSet(key: string, value: unknown) {
-    if (typeof window === "undefined") return;
-    try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* ignore */ }
-}
-
-function lsRemove(key: string) {
-    if (typeof window === "undefined") return;
-    try { localStorage.removeItem(key); } catch { /* ignore */ }
+interface TraceIterProgress {
+    answers: string[];
+    correctness: (boolean | null)[];
+    currentIndex: number;
 }
 
 export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
     const content = problem.content as TraceIterContent;
-    const ansKey = `dailybyte-trace-${problem.byte}-${problem.title.replace(/\s+/g, "")}-ans`;
-    const corrKey = `dailybyte-trace-${problem.byte}-${problem.title.replace(/\s+/g, "")}-corr`;
-    const idxKey  = `dailybyte-trace-${problem.byte}-${problem.title.replace(/\s+/g, "")}-idx`;
+    const { saveProgress, getProgress } = useXp();
+    const progressKey = `trace-${problem.byte}-${problem.title.replace(/\s+/g, "")}`;
 
-    const [answers, setAnswers] = useState<string[]>(() => {
-        // If already submitted (view after page refresh), restore saved answers
-        if (submitted) return lsGet<string[]>(ansKey, Array(content.iterations.length).fill(""));
-        // Active in-progress session: restore partial progress
-        return lsGet<string[]>(ansKey, Array(content.iterations.length).fill(""));
-    });
+    const saved = getProgress(progressKey) as TraceIterProgress | undefined;
 
-    const [correctness, setCorrectness] = useState<(boolean | null)[]>(() => {
-        if (submitted) return lsGet<(boolean | null)[]>(corrKey, Array(content.iterations.length).fill(null));
-        return lsGet<(boolean | null)[]>(corrKey, Array(content.iterations.length).fill(null));
-    });
-
-    const [currentIndex, setCurrentIndex] = useState<number>(() => {
-        if (submitted) return lsGet<number>(idxKey, 0);
-        return lsGet<number>(idxKey, 0);
-    });
+    const [answers, setAnswers] = useState<string[]>(
+        saved?.answers ?? Array(content.iterations.length).fill("")
+    );
+    const [correctness, setCorrectness] = useState<(boolean | null)[]>(
+        saved?.correctness ?? Array(content.iterations.length).fill(null)
+    );
+    const [currentIndex, setCurrentIndex] = useState<number>(
+        saved?.currentIndex ?? 0
+    );
 
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-    // On unmount while not submitted (e.g. redo or navigation), clear saved progress
-    // so the next mount starts fresh. Page refresh doesn't reliably fire this cleanup,
-    // so localStorage survives a refresh and partial progress is restored.
-    useEffect(() => {
-        return () => {
-            if (!submitted) {
-                lsRemove(ansKey);
-                lsRemove(corrKey);
-                lsRemove(idxKey);
-            }
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    // Persist partial answers on every change (skip if submitted — answers are already final)
+    // Persist to in-memory context on every change (only while active, not after submit)
     useEffect(() => {
         if (!submitted) {
-            lsSet(ansKey, answers);
+            saveProgress(progressKey, { answers, correctness, currentIndex });
         }
-    }, [answers, ansKey, submitted]);
-
-    useEffect(() => {
-        if (!submitted) {
-            lsSet(corrKey, correctness);
-        }
-    }, [correctness, corrKey, submitted]);
-
-    useEffect(() => {
-        if (!submitted) {
-            lsSet(idxKey, currentIndex);
-        }
-    }, [currentIndex, idxKey, submitted]);
+    }, [answers, correctness, currentIndex, submitted]);
 
     useEffect(() => {
         if (!submitted && currentIndex < content.iterations.length) {
             inputRefs.current[currentIndex]?.focus();
         }
     }, [currentIndex, submitted]);
-
-    const clearSaved = () => {
-        lsRemove(ansKey);
-        lsRemove(corrKey);
-        lsRemove(idxKey);
-    };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
         if (e.key === "Enter" && !submitted) {
@@ -113,8 +61,8 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
             if (index < content.iterations.length - 1) {
                 setCurrentIndex(Math.max(currentIndex, index + 1));
             } else {
-                // All done — clear saved partial progress
-                clearSaved();
+                // Clear saved progress on completion
+                saveProgress(progressKey, undefined);
                 let correctCount = (isCorrect ? 1 : 0);
                 for (let i = 0; i < index; i++) {
                     if (correctness[i]) correctCount++;
@@ -154,7 +102,6 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
                     let border = "var(--border)";
                     let color = "var(--text)";
 
-                    // Highlight based on correctness
                     if (correctness[index] !== null) {
                         if (correctness[index]) {
                             bg = "var(--green-bg)";
@@ -223,4 +170,3 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
         </div>
     );
 }
-

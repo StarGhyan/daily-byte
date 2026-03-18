@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Problem, SortCodeContent } from "@/lib/types";
+import { useXp } from "@/lib/xp-context";
 
 interface SortCodeProps {
     problem: Problem;
@@ -11,21 +12,37 @@ interface SortCodeProps {
 
 export function SortCode({ problem, onComplete, submitted }: SortCodeProps) {
     const content = problem.content as SortCodeContent;
-    const [lineOrder, setLineOrder] = useState<number[]>([]);
-    const [selectedLineIndex, setSelectedLineIndex] = useState<number | null>(null);
-    const [evaluating, setEvaluating] = useState(false);
-    
-    useEffect(() => {
-        // Initialize line order sequentially
+    const { saveProgress, getProgress } = useXp();
+    const progressKey = `sort-${problem.byte}-${problem.title.replace(/\s+/g, "")}`;
+
+    const [lineOrder, setLineOrder] = useState<number[]>(() => {
+        const saved = getProgress(progressKey) as number[] | undefined;
+        if (saved && saved.length === content.lines.length) return saved;
+        // Shuffle using Fisher-Yates
         const initialOrder = content.lines.map((_, i) => i);
-        // Shuffle lines using Fisher-Yates
         for (let i = initialOrder.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [initialOrder[i], initialOrder[j]] = [initialOrder[j], initialOrder[i]];
         }
-        setLineOrder(initialOrder);
-        setSelectedLineIndex(null);
-    }, [content.lines]);
+        return initialOrder;
+    });
+    const [selectedLineIndex, setSelectedLineIndex] = useState<number | null>(null);
+    const [evaluating, setEvaluating] = useState(false);
+
+    // Keep a stable ref so the initializer closure doesn't go stale
+    const initializedRef = useRef(false);
+    useEffect(() => {
+        // Only run if no saved progress existed (first mount without saved state)
+        if (initializedRef.current) return;
+        initializedRef.current = true;
+    }, []);
+
+    // Save line order to context whenever it changes
+    useEffect(() => {
+        if (!submitted && !evaluating) {
+            saveProgress(progressKey, lineOrder);
+        }
+    }, [lineOrder, submitted, evaluating]);
 
     const handleLineClick = (index: number) => {
         if (submitted || evaluating) return;
@@ -33,15 +50,14 @@ export function SortCode({ problem, onComplete, submitted }: SortCodeProps) {
         if (selectedLineIndex === null) {
             setSelectedLineIndex(index);
         } else if (selectedLineIndex === index) {
-            setSelectedLineIndex(null); // Deselect if clicking the same line
+            setSelectedLineIndex(null);
         } else {
-            // Swap the two lines
             setLineOrder(prev => {
                 const next = [...prev];
                 [next[selectedLineIndex], next[index]] = [next[index], next[selectedLineIndex]];
                 return next;
             });
-            setSelectedLineIndex(null); // Clear selection after swap
+            setSelectedLineIndex(null);
         }
     };
 
@@ -73,6 +89,8 @@ export function SortCode({ problem, onComplete, submitted }: SortCodeProps) {
         if (submitted || evaluating) return;
         setEvaluating(true);
         setSelectedLineIndex(null);
+        // Clear saved progress on submit
+        saveProgress(progressKey, undefined);
         let correctCount = 0;
         for (let i = 0; i < lineOrder.length; i++) {
             if (lineOrder[i] === content.correct_order[i]) {
@@ -89,7 +107,7 @@ export function SortCode({ problem, onComplete, submitted }: SortCodeProps) {
             <div style={{ color: "var(--text)", fontSize: "1.1rem", lineHeight: "1.5" }}>
                 {content.instruction}
             </div>
-            
+
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                 {lineOrder.map((originalIndex, currentIndex) => {
                     const text = content.lines[originalIndex];
@@ -129,18 +147,18 @@ export function SortCode({ problem, onComplete, submitted }: SortCodeProps) {
                     };
 
                     return (
-                        <div 
-                            key={originalIndex} 
+                        <div
+                            key={originalIndex}
                             onClick={() => handleLineClick(currentIndex)}
-                            style={{ 
-                                display: "flex", 
-                                alignItems: "center", 
-                                gap: "0.5rem", 
-                                backgroundColor: bg, 
-                                border: `1px solid ${border}`, 
-                                borderRadius: "8px", 
-                                padding: "0.6rem 0.75rem", 
-                                color: color, 
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.5rem",
+                                backgroundColor: bg,
+                                border: `1px solid ${border}`,
+                                borderRadius: "8px",
+                                padding: "0.6rem 0.75rem",
+                                color: color,
                                 transition: "all 0.2s ease",
                                 cursor: (submitted || evaluating) ? "default" : "pointer",
                                 userSelect: "none"

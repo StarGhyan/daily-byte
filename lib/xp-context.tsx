@@ -1,8 +1,5 @@
 "use client";
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-
-const XP_KEY = "dailybyte-xp";
-const SUBMISSIONS_KEY = "dailybyte-submissions";
+import { createContext, useContext, useState, ReactNode } from "react";
 
 interface Submission {
     correct: boolean;
@@ -12,48 +9,21 @@ interface Submission {
 interface XpState {
     xp: number;
     submissions: Record<string, Submission>;
+    partialProgress: Record<string, any>;
     addXp: (amount: number) => void;
     removeXp: (amount: number) => void;
     submitProblem: (key: string, submission: Submission) => void;
     getSubmission: (key: string) => Submission | undefined;
+    saveProgress: (key: string, data: any) => void;
+    getProgress: (key: string) => any;
 }
 
 const XpContext = createContext<XpState | null>(null);
 
-function readLocalStorage<T>(key: string, fallback: T): T {
-    if (typeof window === "undefined") return fallback;
-    try {
-        const raw = localStorage.getItem(key);
-        if (raw === null) return fallback;
-        return JSON.parse(raw) as T;
-    } catch {
-        return fallback;
-    }
-}
-
-function writeLocalStorage(key: string, value: unknown) {
-    if (typeof window === "undefined") return;
-    try {
-        localStorage.setItem(key, JSON.stringify(value));
-    } catch {
-        // Ignore quota / security errors
-    }
-}
-
 export function XpProvider({ children }: { children: ReactNode }) {
-    const [xp, setXp] = useState<number>(() => readLocalStorage<number>(XP_KEY, 0));
-    const [submissions, setSubmissions] = useState<Record<string, Submission>>(
-        () => readLocalStorage<Record<string, Submission>>(SUBMISSIONS_KEY, {})
-    );
-
-    // Persist to localStorage whenever state changes
-    useEffect(() => {
-        writeLocalStorage(XP_KEY, xp);
-    }, [xp]);
-
-    useEffect(() => {
-        writeLocalStorage(SUBMISSIONS_KEY, submissions);
-    }, [submissions]);
+    const [xp, setXp] = useState(0);
+    const [submissions, setSubmissions] = useState<Record<string, Submission>>({});
+    const [partialProgress, setPartialProgress] = useState<Record<string, any>>({});
 
     const addXp = (amount: number) => setXp((prev) => prev + amount);
     const removeXp = (amount: number) => setXp((prev) => prev - amount);
@@ -65,8 +35,14 @@ export function XpProvider({ children }: { children: ReactNode }) {
 
     const getSubmission = (key: string) => submissions[key];
 
+    const saveProgress = (key: string, data: any) => {
+        setPartialProgress((prev) => ({ ...prev, [key]: data }));
+    };
+
+    const getProgress = (key: string) => partialProgress[key];
+
     return (
-        <XpContext.Provider value={{ xp, submissions, addXp, removeXp, submitProblem, getSubmission }}>
+        <XpContext.Provider value={{ xp, submissions, partialProgress, addXp, removeXp, submitProblem, getSubmission, saveProgress, getProgress }}>
             {children}
         </XpContext.Provider>
     );
@@ -75,10 +51,13 @@ export function XpProvider({ children }: { children: ReactNode }) {
 const defaultState: XpState = {
     xp: 0,
     submissions: {},
+    partialProgress: {},
     addXp: () => { },
     removeXp: () => { },
     submitProblem: () => { },
     getSubmission: () => undefined,
+    saveProgress: () => { },
+    getProgress: () => undefined,
 };
 
 export function useXp() {

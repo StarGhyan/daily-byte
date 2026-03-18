@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Problem, MatchItContent } from "@/lib/types";
+import { useXp } from "@/lib/xp-context";
 
 interface MatchItProps {
     problem: Problem;
@@ -11,11 +12,22 @@ interface MatchItProps {
 
 export function MatchIt({ problem, onComplete, submitted }: MatchItProps) {
     const content = problem.content as MatchItContent;
-    
+    const { saveProgress, getProgress } = useXp();
+    const progressKey = `match-${problem.byte}-${problem.title.replace(/\s+/g, "")}`;
+
+    const saved = getProgress(progressKey) as Record<number, number> | undefined;
+
     // Using mapping algorithm index -> complexity index
-    const [matches, setMatches] = useState<Record<number, number>>({});
+    const [matches, setMatches] = useState<Record<number, number>>(saved ?? {});
     const [selectedAlgo, setSelectedAlgo] = useState<number | null>(null);
     const [evaluating, setEvaluating] = useState(false);
+
+    // Save matches to context whenever they change
+    useEffect(() => {
+        if (!submitted && !evaluating) {
+            saveProgress(progressKey, matches);
+        }
+    }, [matches, submitted, evaluating]);
 
     const handleAlgoClick = (index: number) => {
         if (submitted || evaluating) return;
@@ -37,6 +49,8 @@ export function MatchIt({ problem, onComplete, submitted }: MatchItProps) {
     const handleCheckMatches = () => {
         if (submitted || evaluating) return;
         setEvaluating(true);
+        // Clear saved progress on submit
+        saveProgress(progressKey, undefined);
         let correctCount = 0;
         const totalCount = content.algorithms.length;
 
@@ -47,7 +61,7 @@ export function MatchIt({ problem, onComplete, submitted }: MatchItProps) {
                 correctCount++;
             }
         });
-        
+
         onComplete(correctCount, totalCount);
     };
 
@@ -64,7 +78,7 @@ export function MatchIt({ problem, onComplete, submitted }: MatchItProps) {
                         const isSelected = selectedAlgo === index;
                         const matchIndex = matches[index];
                         const hasMatch = matchIndex !== undefined;
-                        
+
                         let bg = "var(--bg-input)";
                         let border = "var(--border)";
                         let color = "var(--text)";
@@ -125,11 +139,10 @@ export function MatchIt({ problem, onComplete, submitted }: MatchItProps) {
                 <div style={{ display: "flex", flexDirection: "column", gap: "1rem", flex: 1 }}>
                     {content.complexities.map((comp, index) => {
                         const isMatched = Object.values(matches).includes(index);
-                        
+
                         let bg = isMatched ? "rgba(10, 14, 20, 0.5)" : "var(--bg-input)";
-                        let border = selectedAlgo !== null ? "var(--blue)" : "var(--border)";
                         let color = isMatched ? "var(--text-dim)" : "var(--text)";
-                        
+
                         return (
                             <button
                                 key={`comp-${index}`}
@@ -164,18 +177,18 @@ export function MatchIt({ problem, onComplete, submitted }: MatchItProps) {
                 <button
                     onClick={handleCheckMatches}
                     disabled={Object.keys(matches).length !== content.algorithms.length}
-                    style={{ 
-                        padding: "12px 24px", 
-                        backgroundColor: Object.keys(matches).length === content.algorithms.length ? "var(--accent)" : "var(--bg-input)", 
-                        color: Object.keys(matches).length === content.algorithms.length ? "var(--bg-primary)" : "var(--text-muted)", 
-                        border: `1px solid ${Object.keys(matches).length === content.algorithms.length ? "var(--accent)" : "var(--border)"}`, 
-                        borderRadius: "8px", 
-                        fontSize: "1rem", 
-                        fontWeight: "600", 
-                        cursor: Object.keys(matches).length === content.algorithms.length ? "pointer" : "not-allowed", 
-                        alignSelf: "flex-start", 
-                        outline: "none", 
-                        transition: "all 0.2s" 
+                    style={{
+                        padding: "12px 24px",
+                        backgroundColor: Object.keys(matches).length === content.algorithms.length ? "var(--accent)" : "var(--bg-input)",
+                        color: Object.keys(matches).length === content.algorithms.length ? "var(--bg-primary)" : "var(--text-muted)",
+                        border: `1px solid ${Object.keys(matches).length === content.algorithms.length ? "var(--accent)" : "var(--border)"}`,
+                        borderRadius: "8px",
+                        fontSize: "1rem",
+                        fontWeight: "600",
+                        cursor: Object.keys(matches).length === content.algorithms.length ? "pointer" : "not-allowed",
+                        alignSelf: "flex-start",
+                        outline: "none",
+                        transition: "all 0.2s"
                     }}
                 >
                     Check matches
