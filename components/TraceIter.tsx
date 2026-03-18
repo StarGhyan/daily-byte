@@ -42,11 +42,20 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
         }
     }, [answers, correctness, currentIndex, submitted]);
 
+    // Focus the current input whenever currentIndex changes
     useEffect(() => {
         if (!submitted && currentIndex < content.iterations.length) {
             inputRefs.current[currentIndex]?.focus();
         }
     }, [currentIndex, submitted]);
+
+    // On mount: focus the active input (handles restoring saved progress after navigation)
+    useEffect(() => {
+        if (!submitted && currentIndex < content.iterations.length) {
+            inputRefs.current[currentIndex]?.focus();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
         if (e.key === "Enter" && !submitted) {
@@ -127,6 +136,7 @@ export function TraceIter({ problem, onComplete, submitted }: TraceIterProps) {
                                     onChange={(e) => handleChange(e, index)}
                                     onKeyDown={(e) => handleKeyDown(e, index)}
                                     placeholder="..."
+                                    maxLength={iter.answer.length + 2}
                                     style={{
                                         width: "60px",
                                         height: "40px",

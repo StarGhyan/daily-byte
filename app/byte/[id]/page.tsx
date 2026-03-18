@@ -233,12 +233,14 @@ export default function BytePage({ params: _params }: any) {
                 <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
                     {globalSub && (
                         <>
-                            <button 
-                                onClick={() => setShowExplanation(!showExplanation)} 
-                                style={{ background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 16px", color: "var(--text)", fontSize: 12, cursor: "pointer" }}
-                            >
-                                {showExplanation ? "Hide explanation" : "See explanation"}
-                            </button>
+                            {!isRedoingActive && (
+                                <button 
+                                    onClick={() => setShowExplanation(!showExplanation)} 
+                                    style={{ background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 16px", color: "var(--text)", fontSize: 12, cursor: "pointer" }}
+                                >
+                                    {showExplanation ? "Hide explanation" : "See explanation"}
+                                </button>
+                            )}
                             <button onClick={handleRedo} style={{ background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 16px", color: "var(--text)", fontSize: 12, cursor: "pointer" }}>
                                 Redo
                             </button>
