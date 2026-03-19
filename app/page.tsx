@@ -54,15 +54,24 @@ export default function Home() {
                   <div style={{ color: "var(--accent)", fontSize: 13, fontWeight: 600 }}>★ {totalXp} XP</div>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {byteProblems.map((p, i) => (
-                    <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ fontSize: 13, color: "var(--text)" }}>{p.title}</span>
-                      <span style={{
-                        fontSize: 10, fontWeight: 600, color: catColor[p.category],
-                        background: catBg[p.category], padding: "2px 8px", borderRadius: 6,
-                      }}>{p.category}</span>
-                    </div>
-                  ))}
+                    {byteProblems.map((p, i) => {
+                      let displayPrefix = "";
+                      if (p.category !== "Interview prep") {
+                        const match = p.course.match(/\d+/);
+                        if (match) {
+                          displayPrefix = `(${match[0]}) `;
+                        }
+                      }
+                      return (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: 13, color: "var(--text)" }}>{displayPrefix}{p.title}</span>
+                          <span style={{
+                            fontSize: 10, fontWeight: 600, color: catColor[p.category],
+                            background: catBg[p.category], padding: "2px 8px", borderRadius: 6,
+                          }}>{p.category}</span>
+                        </div>
+                      );
+                    })}
                 </div>
                 <div style={{ marginTop: 16, fontSize: 13, color: "var(--text-dim)" }}>Start this byte →</div>
               </div>
