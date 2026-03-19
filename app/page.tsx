@@ -31,7 +31,7 @@ export default function Home() {
       `}</style>
       <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 6 }}>Daily Byte</h1>
       <p style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 32 }}>
-        Bite-sized CS challenges. Complete all 4 problems in each byte.
+        Sharpen your CS skills, one byte at a time. Learn. Practice. Level up.
       </p>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
         {bytes.map(([byteNum, byteProblems]) => {
