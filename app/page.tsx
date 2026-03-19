@@ -68,10 +68,11 @@ export default function Home() {
                       }
                       return (
                         <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <span style={{ fontSize: 13, color: "var(--text)" }}>{displayPrefix}{p.title}</span>
+                          <span style={{ fontSize: 13, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, minWidth: 0 }}>{displayPrefix}{p.title}</span>
                           <span style={{
                             fontSize: 10, fontWeight: 600, color: catColor[p.category],
                             background: catBg[p.category], padding: "2px 8px", borderRadius: 6,
+                            whiteSpace: "nowrap",
                           }}>{p.category}</span>
                         </div>
                       );
