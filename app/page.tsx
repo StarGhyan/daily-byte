@@ -25,6 +25,10 @@ export default function Home() {
 
   return (
     <div>
+      <style>{`
+        .byte-card { cursor: pointer; user-select: none; transition: border-color 0.2s; }
+        .byte-card:hover .byte-start { color: var(--accent) !important; }
+      `}</style>
       <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 6 }}>Daily Byte</h1>
       <p style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 32 }}>
         Bite-sized CS challenges. Complete all 4 problems in each byte.
@@ -34,9 +38,9 @@ export default function Home() {
           const totalXp = byteProblems.reduce((s, p) => s + p.xp, 0);
           return (
             <Link key={byteNum} href={`/byte/${byteNum}`}>
-              <div style={{
+              <div className="byte-card" style={{
                 background: "var(--bg-card)", border: "1px solid var(--border)",
-                borderRadius: 14, padding: 20, cursor: "pointer",
+                borderRadius: 14, padding: 20,
               }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -73,7 +77,7 @@ export default function Home() {
                       );
                     })}
                 </div>
-                <div style={{ marginTop: 16, fontSize: 13, color: "var(--text-dim)" }}>Start this byte →</div>
+                <div className="byte-start" style={{ marginTop: 16, fontSize: 13, color: "var(--text-dim)", transition: "color 0.2s" }}>Start this byte →</div>
               </div>
             </Link>
           );
