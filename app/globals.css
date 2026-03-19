@@ -35,6 +35,12 @@ body {
   color: var(--text);
   font-family: 'IBM Plex Mono', monospace;
   min-height: 100vh;
+  caret-color: transparent;
+}
+
+input,
+textarea {
+  caret-color: auto;
 }
 
 a {
