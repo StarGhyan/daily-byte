@@ -24,7 +24,7 @@ export default function Home() {
   const bytes = Array.from(byteMap.entries()).sort((a, b) => a[0] - b[0]);
 
   return (
-    <div>
+    <div style={{ maxWidth: 1000, margin: "0 auto" }}>
       <style>{`
         .byte-card { cursor: pointer; user-select: none; transition: border-color 0.2s; }
         .byte-card:hover .byte-start { color: var(--accent) !important; }

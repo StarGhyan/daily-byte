@@ -18,7 +18,7 @@ export default function RootLayout({
       <body>
         <XpProvider>
           <Header />
-          <main style={{ maxWidth: 800, margin: "0 auto", padding: "40px 20px" }}>
+          <main style={{ padding: "40px 20px" }}>
             {children}
           </main>
         </XpProvider>

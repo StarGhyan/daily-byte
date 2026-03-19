@@ -130,7 +130,7 @@ export default function BytePage({ params: _params }: any) {
 
     if (activeIdx === null) {
         return (
-            <div>
+            <div style={{ maxWidth: 800, margin: "0 auto" }}>
                 <Link href="/" style={{ color: "var(--text-dim)", fontSize: 13, display: "block", marginBottom: 16 }}>← All bytes</Link>
                 <h1 style={{ fontSize: 24, fontWeight: 700 }}>Byte #{byteNum}</h1>
                 <p style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 24 }}>
@@ -179,7 +179,7 @@ export default function BytePage({ params: _params }: any) {
     const componentKey = `${activeIdx}-${redoCount}`;
 
     return (
-        <div>
+        <div style={{ maxWidth: 800, margin: "0 auto" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
                 <div onClick={closeProblem} style={{ color: "var(--text-dim)", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center" }}>← Back to menu</div>
             </div>
