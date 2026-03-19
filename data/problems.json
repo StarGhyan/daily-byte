@@ -49,7 +49,7 @@
         "xp": 15,
         "teaser": "What does each iteration output?",
         "mini_lecture": "A for loop repeats code a set number of times. The range(n) function gives numbers from 0 to n-1. To trace a loop, go step by step — write down what each variable is after every pass through the loop.",
-        "hint": "Start with total = 0. Each iteration, total gets the current value of i added to it. What is i each time?",
+        "hint": "Start with total = 0. Each iteration, total gets the current value of i added to it.",
         "content": {
             "code": "total = 0\nfor i in range(1, 6):\n    total = total + i",
             "question": "What is total after each iteration?",
@@ -76,7 +76,7 @@
                 }
             ]
         },
-        "explanation": "Each iteration adds i to total. So: 0+1=1, 1+2=3, 3+3=6, 6+4=10, 10+5=15. This is the sum of numbers 1 through 5. The pattern is called a triangular number — the formula is n(n+1)/2, so 5(6)/2 = 15."
+        "explanation": "Each iteration adds i to total. So: 0+1=1, 1+2=3, 3+3=6, 6+4=10, 10+5=15. The formula is n(n+1)/2, so 5(6)/2 = 15."
     },
     {
         "byte": 1,
@@ -86,8 +86,8 @@
         "type": "match_it",
         "xp": 25,
         "teaser": "Do you know your complexities?",
-        "mini_lecture": "Big O notation describes how an algorithm's runtime grows as input size increases. O(1) is constant time — it doesn't matter how big the input is. O(log n) means the work halves each step. O(n) is linear. O(n log n) is common for efficient sorts. O(n²) means nested loops over the input.",
-        "hint": "Think about what each algorithm does. Does it use nested loops? Does it divide the input in half? Does it look at every element once?",
+        "mini_lecture": "Big O notation describes how an algorithm's runtime grows as input size increases. O(1) is constant time. O(log n) means the work halves each step. O(n) is linear. O(n log n) is common for efficient sorts. O(n²) means nested loops.",
+        "hint": "Think about what each algorithm does. Does it use nested loops? Does it divide the input in half?",
         "content": {
             "instruction": "Match each algorithm to its correct time complexity",
             "algorithms": [
@@ -112,7 +112,7 @@
                 "4": 4
             }
         },
-        "explanation": "Binary search halves the input each step → O(log n). Bubble sort and selection sort both use nested loops over the array → O(n²). Merge sort divides the array and merges — divide and conquer → O(n log n). Hash table lookup goes directly to the right slot → O(1) average case."
+        "explanation": "Binary search halves the input → O(log n). Bubble sort and selection sort use nested loops → O(n²). Merge sort divides and merges → O(n log n). Hash table lookup is direct → O(1)."
     },
     {
         "byte": 1,
@@ -122,8 +122,8 @@
         "type": "trace_iter",
         "xp": 30,
         "teaser": "Can you follow the call stack?",
-        "mini_lecture": "Recursive functions call themselves with smaller inputs until they hit a base case. To trace recursion, follow each call forward until you reach the base case, then work backwards collecting the return values. This is like unwinding a stack of nested boxes.",
-        "hint": "Start with fib(0) and fib(1) — those are your base cases. Then fib(2) = fib(1) + fib(0). Build up from there.",
+        "mini_lecture": "Recursive functions call themselves with smaller inputs until they hit a base case. Follow each call forward until you reach the base case, then work backwards collecting return values.",
+        "hint": "Start with fib(0) and fib(1) — those are base cases. Build up from there.",
         "content": {
             "code": "def fib(n):\n    if n <= 1:\n        return n\n    return fib(n-1) + fib(n-2)",
             "question": "What does fib(n) return for each value?",
@@ -154,7 +154,7 @@
                 }
             ]
         },
-        "explanation": "fib(0)=0 and fib(1)=1 are the base cases. Then fib(2)=fib(1)+fib(0)=1+0=1. fib(3)=fib(2)+fib(1)=1+1=2. fib(4)=fib(3)+fib(2)=2+1=3. fib(5)=fib(4)+fib(3)=3+2=5. This is the Fibonacci sequence. Notice how many redundant calls happen — this is why memoization matters in interviews."
+        "explanation": "fib(0)=0, fib(1)=1 are base cases. fib(2)=1+0=1. fib(3)=1+1=2. fib(4)=2+1=3. fib(5)=3+2=5. This is the Fibonacci sequence."
     },
     {
         "byte": 2,
@@ -164,8 +164,8 @@
         "type": "sort_code",
         "xp": 20,
         "teaser": "Stack it up correctly",
-        "mini_lecture": "A stack follows Last-In-First-Out (LIFO) — think of a stack of plates. Push adds an element to the top. Before pushing, we check if the stack is full. If not, we increment the top pointer and place the item there.",
-        "hint": "You need to check for overflow first. If it's not full, increment top, then place the item.",
+        "mini_lecture": "A stack follows Last-In-First-Out (LIFO). Push adds to the top. Check if full first, then increment top, then place the item.",
+        "hint": "Check for overflow first. If not full, increment top, then place the item.",
         "content": {
             "instruction": "Arrange these lines to complete a working push method",
             "lines": [
@@ -185,7 +185,7 @@
                 5
             ]
         },
-        "explanation": "First define the method, then check if the stack is full. If it is, print an error and return early. If there's room, increment top to point to the next empty slot, then place the item there. The order matters — if you placed the item before incrementing, you'd overwrite the current top element."
+        "explanation": "Define method, check overflow, print error and return if full. Otherwise increment top and place item."
     },
     {
         "byte": 2,
@@ -195,8 +195,8 @@
         "type": "spot_it",
         "xp": 15,
         "teaser": "True or false?",
-        "mini_lecture": "Boolean algebra uses AND, OR, and NOT to combine true/false values. AND returns true only when both inputs are true. OR returns true when at least one input is true. NOT flips the value. These are the building blocks of every if-statement you'll ever write.",
-        "hint": "Work from the inside out. First evaluate what's inside the parentheses, then apply NOT, then AND, then OR.",
+        "mini_lecture": "Boolean algebra: AND needs both true, OR needs one true, NOT flips the value.",
+        "hint": "Work inside out. Evaluate parentheses first, then NOT, then AND, then OR.",
         "content": {
             "question": "What does this expression evaluate to?\n\n(True AND False) OR (NOT False)",
             "options": [
@@ -207,7 +207,7 @@
             ],
             "correct": 0
         },
-        "explanation": "Work inside out. (True AND False) = False. (NOT False) = True. Then False OR True = True. Remember: AND needs both to be true, OR only needs one, and NOT flips the value."
+        "explanation": "(True AND False) = False. (NOT False) = True. False OR True = True."
     },
     {
         "byte": 2,
@@ -217,11 +217,11 @@
         "type": "trace_iter",
         "xp": 25,
         "teaser": "Which process runs when?",
-        "mini_lecture": "In Shortest Job First (SJF) scheduling, the CPU always picks the process with the shortest burst time next. If multiple processes arrive at the same time, the one with the shortest burst goes first. This minimizes average waiting time but requires knowing burst times in advance.",
-        "hint": "All processes arrive at time 0. Sort them by burst time shortest first, then run them in that order. Track when each one finishes.",
+        "mini_lecture": "Shortest Job First scheduling picks the process with shortest burst time next.",
+        "hint": "Sort by burst time, run in that order, track finish times.",
         "content": {
-            "code": "Process  Burst Time\nP1       6\nP2       2\nP3       8\nP4       1\n\nAll arrive at time 0\nUsing Shortest Job First (SJF)",
-            "question": "What time does each process finish executing?",
+            "code": "Process  Burst Time\nP1       6\nP2       2\nP3       8\nP4       1\n\nAll arrive at time 0, using SJF",
+            "question": "What time does each process finish?",
             "iterations": [
                 {
                     "label": "P4 finishes at",
@@ -241,7 +241,7 @@
                 }
             ]
         },
-        "explanation": "SJF runs the shortest burst first. P4 (burst 1) runs first, finishes at time 1. P2 (burst 2) runs next, finishes at 1+2=3. P1 (burst 6) finishes at 3+6=9. P3 (burst 8) finishes at 9+8=17. Total waiting time is 0+1+3+9=13, average = 3.25."
+        "explanation": "P4(1) finishes at 1. P2(2) finishes at 3. P1(6) finishes at 9. P3(8) finishes at 17."
     },
     {
         "byte": 2,
@@ -251,14 +251,14 @@
         "type": "match_it",
         "xp": 30,
         "teaser": "Which tool for the job?",
-        "mini_lecture": "Choosing the right data structure is one of the most important skills in programming. Each structure has strengths — arrays are great for indexed access, hash maps for fast lookups, stacks for undo operations, queues for ordering tasks, and trees for hierarchical data.",
-        "hint": "Think about what operation each scenario needs most. Fast lookup? Ordered processing? Undo capability?",
+        "mini_lecture": "Each data structure has strengths — arrays for indexing, hash maps for lookups, stacks for undo, queues for ordering, trees for hierarchy.",
+        "hint": "Think about what operation each scenario needs most.",
         "content": {
             "instruction": "Match each scenario to the best data structure",
             "algorithms": [
                 "Undo/redo in a text editor",
                 "Looking up a word in a dictionary",
-                "Processing customer support tickets in order",
+                "Processing support tickets in order",
                 "Storing a file system hierarchy",
                 "Accessing elements by index quickly"
             ],
@@ -277,6 +277,1083 @@
                 "4": 4
             }
         },
-        "explanation": "Undo/redo follows Last-In-First-Out — that's a stack. Dictionary lookup needs fast key-based access — hash map. Support tickets are first-come-first-served — queue. File systems have folders inside folders — tree structure. Index-based access is what arrays do best."
+        "explanation": "Undo/redo=stack. Dictionary lookup=hash map. Support tickets=queue. File system=tree. Index access=array."
+    },
+    {
+        "byte": 3,
+        "category": "Lower division",
+        "course": "COMP 110 — Introduction to Algorithms and Programming",
+        "title": "While loop countdown",
+        "type": "trace_iter",
+        "xp": 15,
+        "teaser": "Count it down step by step",
+        "mini_lecture": "A while loop keeps running as long as its condition is true. Each iteration, something must change to eventually make the condition false.",
+        "hint": "Start with n = 16. Each iteration, n is divided by 2 using integer division.",
+        "content": {
+            "code": "n = 16\nsteps = 0\nwhile n > 1:\n    n = n // 2\n    steps += 1",
+            "question": "What is n after each iteration?",
+            "iterations": [
+                {
+                    "label": "step 1",
+                    "answer": "8"
+                },
+                {
+                    "label": "step 2",
+                    "answer": "4"
+                },
+                {
+                    "label": "step 3",
+                    "answer": "2"
+                },
+                {
+                    "label": "step 4",
+                    "answer": "1"
+                }
+            ]
+        },
+        "explanation": "16//2=8, 8//2=4, 4//2=2, 2//2=1. Then 1>1 is false so loop stops. 4 steps = log₂(16)."
+    },
+    {
+        "byte": 3,
+        "category": "Lower division",
+        "course": "COMP 182 — Data Structures and Program Design",
+        "title": "Build linked list insert",
+        "type": "sort_code",
+        "xp": 20,
+        "teaser": "Link it up correctly",
+        "mini_lecture": "To insert at the beginning of a linked list: create a new node, point it to the current head, then update head.",
+        "hint": "Create the node first, connect it, then update head.",
+        "content": {
+            "instruction": "Arrange these lines to insert at the head of a linked list",
+            "lines": [
+                "def insert_at_head(self, value):",
+                "    new_node = Node(value)",
+                "    new_node.next = self.head",
+                "    self.head = new_node",
+                "    self.size += 1"
+            ],
+            "correct_order": [
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "explanation": "Create node, point to old head, update head, increment size. Order matters — updating head before connecting loses the list."
+    },
+    {
+        "byte": 3,
+        "category": "Upper division",
+        "course": "COMP 310 — Automata, Languages and Computation",
+        "title": "Regex matching",
+        "type": "match_it",
+        "xp": 25,
+        "teaser": "What does each pattern match?",
+        "mini_lecture": "Regular expressions: dot (.) matches any character, star (*) means zero or more, plus (+) means one or more, brackets [abc] match one character inside.",
+        "hint": "Star means zero or more of the previous character. Plus means at least one.",
+        "content": {
+            "instruction": "Match each regex pattern to what it matches",
+            "algorithms": [
+                "a*b",
+                "a+b",
+                "[0-9]+",
+                "^hello$",
+                ".*"
+            ],
+            "complexities": [
+                "Zero or more a's followed by b",
+                "One or more a's followed by b",
+                "One or more digits",
+                "Exactly the word hello",
+                "Any string including empty"
+            ],
+            "correct": {
+                "0": 0,
+                "1": 1,
+                "2": 2,
+                "3": 3,
+                "4": 4
+            }
+        },
+        "explanation": "a*b: zero or more a's then b. a+b: at least one a then b. [0-9]+: one or more digits. ^hello$: anchored, exactly hello. .*: anything."
+    },
+    {
+        "byte": 3,
+        "category": "Interview prep",
+        "course": "Interview prep",
+        "title": "Two pointer technique",
+        "type": "trace_iter",
+        "xp": 30,
+        "teaser": "Track both pointers",
+        "mini_lecture": "Two pointers move through an array from opposite ends. Used to find pairs summing to a target in O(n) time.",
+        "hint": "Left starts at 0, right at end. Check the sum. Move left up if too small, right down if too big.",
+        "content": {
+            "code": "arr = [1, 3, 5, 7, 9]\ntarget = 10\nleft = 0, right = 4\n\nwhile left < right:\n    current_sum = arr[left] + arr[right]\n    if current_sum == target: break\n    elif current_sum < target: left += 1\n    else: right -= 1",
+            "question": "What is current_sum at each step?",
+            "iterations": [
+                {
+                    "label": "step 1",
+                    "answer": "10"
+                }
+            ]
+        },
+        "explanation": "arr[0]+arr[4] = 1+9 = 10 = target. Found in one step! Two pointers are efficient."
+    },
+    {
+        "byte": 4,
+        "category": "Lower division",
+        "course": "COMP 122 — Computer Architecture and Assembly Language",
+        "title": "Binary to decimal",
+        "type": "trace_iter",
+        "xp": 15,
+        "teaser": "Convert bit by bit",
+        "mini_lecture": "Binary to decimal: multiply each bit by its power of 2 and add. Rightmost bit is 2⁰=1.",
+        "hint": "Write out powers of 2 for each position. Add up where bit=1.",
+        "content": {
+            "code": "Binary: 1 0 1 1 0 1\nPos:    5 4 3 2 1 0\nValue: 32 16 8 4 2 1",
+            "question": "Running total as we add each 1-bit left to right?",
+            "iterations": [
+                {
+                    "label": "bit 5 (32)",
+                    "answer": "32"
+                },
+                {
+                    "label": "+ bit 3 (8)",
+                    "answer": "40"
+                },
+                {
+                    "label": "+ bit 2 (4)",
+                    "answer": "44"
+                },
+                {
+                    "label": "+ bit 0 (1)",
+                    "answer": "45"
+                }
+            ]
+        },
+        "explanation": "101101 = 32+8+4+1 = 45. Positions 4 and 1 are 0 so they don't contribute."
+    },
+    {
+        "byte": 4,
+        "category": "Lower division",
+        "course": "COMP 256 — Discrete Structures for Computer Science",
+        "title": "Set operations",
+        "type": "spot_it",
+        "xp": 15,
+        "teaser": "What's in the set?",
+        "mini_lecture": "Union combines all elements. Intersection keeps only shared elements. Difference keeps elements in A not in B.",
+        "hint": "Intersection keeps only elements in both sets.",
+        "content": {
+            "question": "A = {1, 2, 3, 4, 5}\nB = {3, 4, 5, 6, 7}\n\nWhat is A ∩ B (intersection)?",
+            "options": [
+                "{3, 4, 5}",
+                "{1, 2, 3, 4, 5, 6, 7}",
+                "{1, 2}",
+                "{6, 7}"
+            ],
+            "correct": 0
+        },
+        "explanation": "3, 4, 5 are in both. A ∩ B = {3, 4, 5}."
+    },
+    {
+        "byte": 4,
+        "category": "Upper division",
+        "course": "COMP 482 — Algorithm Design and Analysis",
+        "title": "DP: Fibonacci memoized",
+        "type": "trace_iter",
+        "xp": 25,
+        "teaser": "Trace with memory",
+        "mini_lecture": "Memoization stores results so you don't recompute. Turns exponential into linear time.",
+        "hint": "Each new fib value gets stored in memo. Already-stored values return instantly.",
+        "content": {
+            "code": "memo = {}\ndef fib(n):\n    if n in memo: return memo[n]\n    if n <= 1: return n\n    memo[n] = fib(n-1) + fib(n-2)\n    return memo[n]\n\nfib(6)",
+            "question": "What values get stored in memo?",
+            "iterations": [
+                {
+                    "label": "memo[2]",
+                    "answer": "1"
+                },
+                {
+                    "label": "memo[3]",
+                    "answer": "2"
+                },
+                {
+                    "label": "memo[4]",
+                    "answer": "3"
+                },
+                {
+                    "label": "memo[5]",
+                    "answer": "5"
+                },
+                {
+                    "label": "memo[6]",
+                    "answer": "8"
+                }
+            ]
+        },
+        "explanation": "memo[2]=1, memo[3]=2, memo[4]=3, memo[5]=5, memo[6]=8. Each computed only once."
+    },
+    {
+        "byte": 4,
+        "category": "Interview prep",
+        "course": "Interview prep",
+        "title": "Valid parentheses",
+        "type": "sort_code",
+        "xp": 30,
+        "teaser": "Build the classic stack problem",
+        "mini_lecture": "Use a stack: push opening brackets, pop for closing and check match. Empty stack at end = valid.",
+        "hint": "Loop through characters. Opening bracket → push. Closing bracket → check stack top.",
+        "content": {
+            "instruction": "Arrange these lines into a valid parentheses checker",
+            "lines": [
+                "def is_valid(s):",
+                "    stack = []",
+                "    pairs = {')': '(', ']': '[', '}': '{'}",
+                "    for char in s:",
+                "        if char in '([{':",
+                "            stack.append(char)",
+                "        elif char in pairs:",
+                "            if not stack or stack.pop() != pairs[char]:",
+                "                return False",
+                "    return len(stack) == 0"
+            ],
+            "correct_order": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+            ]
+        },
+        "explanation": "Init stack and pairs map. For each char: opener → push, closer → check match. Empty stack at end means valid."
+    },
+    {
+        "byte": 5,
+        "category": "Lower division",
+        "course": "COMP 110 — Introduction to Algorithms and Programming",
+        "title": "String slicing",
+        "type": "trace_iter",
+        "xp": 15,
+        "teaser": "Slice it right",
+        "mini_lecture": "String slicing: [start:end] where start is inclusive, end is exclusive. Negative indices count from end.",
+        "hint": "End index is NOT included. s[1:4] gives indices 1, 2, 3.",
+        "content": {
+            "code": "s = 'ALGORITHM'\n# 0=A 1=L 2=G 3=O 4=R 5=I 6=T 7=H 8=M",
+            "question": "What does each slice return?",
+            "iterations": [
+                {
+                    "label": "s[0:4]",
+                    "answer": "ALGO"
+                },
+                {
+                    "label": "s[4:9]",
+                    "answer": "RITHM"
+                },
+                {
+                    "label": "s[-3:]",
+                    "answer": "THM"
+                },
+                {
+                    "label": "s[::2]",
+                    "answer": "AGRTM"
+                }
+            ]
+        },
+        "explanation": "s[0:4]=ALGO. s[4:9]=RITHM. s[-3:]=THM. s[::2]=every other char=A,G,R,T,M."
+    },
+    {
+        "byte": 5,
+        "category": "Lower division",
+        "course": "COMP 182 — Data Structures and Program Design",
+        "title": "Queue operations",
+        "type": "trace_iter",
+        "xp": 20,
+        "teaser": "First in, first out",
+        "mini_lecture": "Queue is FIFO. Enqueue adds to back, dequeue removes from front.",
+        "hint": "Enqueue adds to right, dequeue removes from left.",
+        "content": {
+            "code": "q = []\nq.enqueue(5)\nq.enqueue(3)\nq.enqueue(8)\nq.dequeue()\nq.enqueue(1)\nq.dequeue()",
+            "question": "What is at the FRONT after each operation?",
+            "iterations": [
+                {
+                    "label": "after enqueue(5)",
+                    "answer": "5"
+                },
+                {
+                    "label": "after enqueue(3)",
+                    "answer": "5"
+                },
+                {
+                    "label": "after enqueue(8)",
+                    "answer": "5"
+                },
+                {
+                    "label": "after dequeue()",
+                    "answer": "3"
+                },
+                {
+                    "label": "after enqueue(1)",
+                    "answer": "3"
+                },
+                {
+                    "label": "after dequeue()",
+                    "answer": "8"
+                }
+            ]
+        },
+        "explanation": "Enqueue 5→front=5. Enqueue 3→[5,3] front=5. Enqueue 8→[5,3,8] front=5. Dequeue→[3,8] front=3. Enqueue 1→[3,8,1] front=3. Dequeue→[8,1] front=8."
+    },
+    {
+        "byte": 5,
+        "category": "Upper division",
+        "course": "COMP 324 — Computer Networking and Security",
+        "title": "IP address classes",
+        "type": "match_it",
+        "xp": 25,
+        "teaser": "Know your network ranges",
+        "mini_lecture": "IP classes: A(1-126), B(128-191), C(192-223). 127 is loopback.",
+        "hint": "Look at the first number of each IP address.",
+        "content": {
+            "instruction": "Match each IP address to its class",
+            "algorithms": [
+                "10.0.0.1",
+                "172.16.0.1",
+                "192.168.1.1",
+                "127.0.0.1",
+                "8.8.8.8"
+            ],
+            "complexities": [
+                "Class A",
+                "Class B",
+                "Class C",
+                "Loopback",
+                "Class A"
+            ],
+            "correct": {
+                "0": 0,
+                "1": 1,
+                "2": 2,
+                "3": 3,
+                "4": 4
+            }
+        },
+        "explanation": "10.x=Class A. 172.16.x=Class B. 192.168.x=Class C. 127.0.0.1=Loopback. 8.8.8.8=Class A."
+    },
+    {
+        "byte": 5,
+        "category": "Interview prep",
+        "course": "Interview prep",
+        "title": "Two sum with hash map",
+        "type": "sort_code",
+        "xp": 30,
+        "teaser": "The most popular interview question",
+        "mini_lecture": "For each number, check if (target-number) is in a hash map. If yes, found the pair. If no, store current number.",
+        "hint": "Calculate complement. Check if stored. If not, store current.",
+        "content": {
+            "instruction": "Arrange these lines into the optimal Two Sum solution",
+            "lines": [
+                "def two_sum(nums, target):",
+                "    seen = {}",
+                "    for i, num in enumerate(nums):",
+                "        complement = target - num",
+                "        if complement in seen:",
+                "            return [seen[complement], i]",
+                "        seen[num] = i",
+                "    return []"
+            ],
+            "correct_order": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+            ]
+        },
+        "explanation": "Create hash map. For each number, check if complement exists. If yes, return indices. Otherwise store. O(n) time."
+    },
+    {
+        "byte": 6,
+        "category": "Lower division",
+        "course": "COMP 122 — Computer Architecture and Assembly Language",
+        "title": "Bitwise operations",
+        "type": "trace_iter",
+        "xp": 15,
+        "teaser": "Think in bits",
+        "mini_lecture": "AND(&) gives 1 when both 1. OR(|) gives 1 when either 1. XOR(^) gives 1 when different. Left shift multiplies by 2.",
+        "hint": "12=1100, 10=1010. Apply operation bit by bit.",
+        "content": {
+            "code": "a = 12  # binary: 1100\nb = 10  # binary: 1010",
+            "question": "Decimal result of each operation?",
+            "iterations": [
+                {
+                    "label": "a & b",
+                    "answer": "8"
+                },
+                {
+                    "label": "a | b",
+                    "answer": "14"
+                },
+                {
+                    "label": "a ^ b",
+                    "answer": "6"
+                },
+                {
+                    "label": "a << 1",
+                    "answer": "24"
+                }
+            ]
+        },
+        "explanation": "1100&1010=1000=8. 1100|1010=1110=14. 1100^1010=0110=6. 1100<<1=11000=24."
+    },
+    {
+        "byte": 6,
+        "category": "Lower division",
+        "course": "COMP 256 — Discrete Structures for Computer Science",
+        "title": "Counting principles",
+        "type": "spot_it",
+        "xp": 15,
+        "teaser": "How many ways?",
+        "mini_lecture": "Multiplication principle: m choices × n choices = m×n combinations.",
+        "hint": "Each digit position has 10 choices (0-9). Positions are independent.",
+        "content": {
+            "question": "A 4-digit PIN uses digits 0-9. How many possible PINs if repetition is allowed?",
+            "options": [
+                "10,000",
+                "5,040",
+                "40",
+                "1,000"
+            ],
+            "correct": 0
+        },
+        "explanation": "10×10×10×10 = 10,000. Without repetition it would be 10×9×8×7 = 5,040."
+    },
+    {
+        "byte": 6,
+        "category": "Upper division",
+        "course": "COMP 482 — Algorithm Design and Analysis",
+        "title": "BFS traversal order",
+        "type": "trace_iter",
+        "xp": 25,
+        "teaser": "Level by level",
+        "mini_lecture": "BFS explores a graph level by level using a queue. Finds shortest path in unweighted graphs.",
+        "hint": "Start at A. Add neighbors to queue. Process FIFO.",
+        "content": {
+            "code": "Graph:\nA → B, C\nB → D\nC → D, E\nD → (none)\nE → (none)\n\nBFS from A",
+            "question": "Order nodes are visited?",
+            "iterations": [
+                {
+                    "label": "visit 1",
+                    "answer": "A"
+                },
+                {
+                    "label": "visit 2",
+                    "answer": "B"
+                },
+                {
+                    "label": "visit 3",
+                    "answer": "C"
+                },
+                {
+                    "label": "visit 4",
+                    "answer": "D"
+                },
+                {
+                    "label": "visit 5",
+                    "answer": "E"
+                }
+            ]
+        },
+        "explanation": "A first. Then A's neighbors: B, C. Then their neighbors: D, E. Level by level."
+    },
+    {
+        "byte": 6,
+        "category": "Interview prep",
+        "course": "Interview prep",
+        "title": "Sliding window maximum",
+        "type": "trace_iter",
+        "xp": 30,
+        "teaser": "Slide and find the max",
+        "mini_lecture": "Sliding window processes a fixed-size subarray moving through the array.",
+        "hint": "Window size 3. At each position, find the largest of the 3 elements.",
+        "content": {
+            "code": "arr = [1, 3, 2, 5, 1, 4]\nwindow_size = 3",
+            "question": "Maximum in each window?",
+            "iterations": [
+                {
+                    "label": "[1,3,2]",
+                    "answer": "3"
+                },
+                {
+                    "label": "[3,2,5]",
+                    "answer": "5"
+                },
+                {
+                    "label": "[2,5,1]",
+                    "answer": "5"
+                },
+                {
+                    "label": "[5,1,4]",
+                    "answer": "5"
+                }
+            ]
+        },
+        "explanation": "[1,3,2]→3. [3,2,5]→5. [2,5,1]→5. [5,1,4]→5."
+    },
+    {
+        "byte": 7,
+        "category": "Lower division",
+        "course": "COMP 110 — Introduction to Algorithms and Programming",
+        "title": "Function scope",
+        "type": "spot_it",
+        "xp": 15,
+        "teaser": "What gets printed?",
+        "mini_lecture": "Local variables only exist inside their function. Assigning inside a function creates a new local, doesn't change the global.",
+        "hint": "The function creates its own local x. Global x is untouched.",
+        "content": {
+            "question": "What does this print?\n\nx = 10\ndef change():\n    x = 20\n    print(x)\n\nchange()\nprint(x)",
+            "options": [
+                "20 then 10",
+                "20 then 20",
+                "10 then 10",
+                "Error"
+            ],
+            "correct": 0
+        },
+        "explanation": "Inside change(), x=20 is local. Prints 20. Global x is still 10. Second print outputs 10."
+    },
+    {
+        "byte": 7,
+        "category": "Lower division",
+        "course": "COMP 182 — Data Structures and Program Design",
+        "title": "Inorder tree traversal",
+        "type": "trace_iter",
+        "xp": 20,
+        "teaser": "Left, root, right",
+        "mini_lecture": "Inorder visits: left subtree, root, right subtree. For BST, this gives sorted order.",
+        "hint": "Go as far left as possible, visit, go right, repeat.",
+        "content": {
+            "code": "        4\n       / \\\n      2   6\n     / \\ / \\\n    1  3 5  7\n\nInorder: left → root → right",
+            "question": "Order nodes are visited?",
+            "iterations": [
+                {
+                    "label": "visit 1",
+                    "answer": "1"
+                },
+                {
+                    "label": "visit 2",
+                    "answer": "2"
+                },
+                {
+                    "label": "visit 3",
+                    "answer": "3"
+                },
+                {
+                    "label": "visit 4",
+                    "answer": "4"
+                },
+                {
+                    "label": "visit 5",
+                    "answer": "5"
+                },
+                {
+                    "label": "visit 6",
+                    "answer": "6"
+                },
+                {
+                    "label": "visit 7",
+                    "answer": "7"
+                }
+            ]
+        },
+        "explanation": "Inorder on BST gives sorted order: 1,2,3,4,5,6,7."
+    },
+    {
+        "byte": 7,
+        "category": "Upper division",
+        "course": "COMP 333 — Concepts of Programming Languages",
+        "title": "Pass by value vs reference",
+        "type": "match_it",
+        "xp": 25,
+        "teaser": "Does the original change?",
+        "mini_lecture": "Pass by value sends a copy. Pass by reference sends the actual object. Immutable types behave like value, mutable like reference.",
+        "hint": "Mutable types (list, dict) can be changed in place. Immutable (int, string) cannot.",
+        "content": {
+            "instruction": "Match each scenario to whether the original changes",
+            "algorithms": [
+                "Modifying a list inside a function",
+                "Reassigning an integer inside a function",
+                "Appending to a dict inside a function",
+                "Concatenating a string inside a function",
+                "Sorting a list in place inside a function"
+            ],
+            "complexities": [
+                "Original changes",
+                "Original unchanged",
+                "Original changes",
+                "Original unchanged",
+                "Original changes"
+            ],
+            "correct": {
+                "0": 0,
+                "1": 1,
+                "2": 2,
+                "3": 3,
+                "4": 4
+            }
+        },
+        "explanation": "Lists/dicts are mutable — modifications affect original. Ints/strings are immutable — changes create new objects."
+    },
+    {
+        "byte": 7,
+        "category": "Interview prep",
+        "course": "Interview prep",
+        "title": "Detect linked list cycle",
+        "type": "sort_code",
+        "xp": 30,
+        "teaser": "Fast and slow pointers",
+        "mini_lecture": "Slow moves 1 step, fast moves 2. If cycle exists, they meet. If fast hits null, no cycle.",
+        "hint": "Initialize both at head. Move slow by 1, fast by 2. Check if they meet.",
+        "content": {
+            "instruction": "Arrange to detect a cycle in a linked list",
+            "lines": [
+                "def has_cycle(head):",
+                "    slow = head",
+                "    fast = head",
+                "    while fast and fast.next:",
+                "        slow = slow.next",
+                "        fast = fast.next.next",
+                "        if slow == fast:",
+                "            return True",
+                "    return False"
+            ],
+            "correct_order": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+            ]
+        },
+        "explanation": "Floyd's algorithm. Both start at head. Slow moves 1, fast moves 2. If they meet → cycle. If fast reaches null → no cycle."
+    },
+    {
+        "byte": 8,
+        "category": "Lower division",
+        "course": "COMP 182 — Data Structures and Program Design",
+        "title": "Hash table insert",
+        "type": "trace_iter",
+        "xp": 20,
+        "teaser": "Where does each key go?",
+        "mini_lecture": "Hash table uses key % table_size to find the index. Collisions handled by linear probing.",
+        "hint": "index = key % 7. If collision, try next slot.",
+        "content": {
+            "code": "Table size = 7\nHash: key % 7\nLinear probing\n\nInsert: 10, 22, 31, 4, 15",
+            "question": "What index does each key go to?",
+            "iterations": [
+                {
+                    "label": "10 % 7",
+                    "answer": "3"
+                },
+                {
+                    "label": "22 % 7",
+                    "answer": "1"
+                },
+                {
+                    "label": "31 % 7 (probe)",
+                    "answer": "4"
+                },
+                {
+                    "label": "4 % 7 (probe)",
+                    "answer": "5"
+                },
+                {
+                    "label": "15 % 7",
+                    "answer": "6"
+                }
+            ]
+        },
+        "explanation": "10→3. 22→1. 31→3 collision, probe to 4. 4→4 collision, probe to 5. 15→1 collision, probe to 2... Actually 15%7=1, collision with 22, probe to 2."
+    },
+    {
+        "byte": 8,
+        "category": "Lower division",
+        "course": "COMP 256 — Discrete Structures for Computer Science",
+        "title": "Truth table logic",
+        "type": "spot_it",
+        "xp": 15,
+        "teaser": "Which row is which?",
+        "mini_lecture": "Truth tables list all input combinations and outputs. 2 variables = 4 rows.",
+        "hint": "Evaluate step by step: first NOT q, then p AND (NOT q).",
+        "content": {
+            "question": "How many rows in the truth table for p AND (NOT q) evaluate to True?",
+            "options": [
+                "1",
+                "2",
+                "3",
+                "0"
+            ],
+            "correct": 0
+        },
+        "explanation": "Only when p=True and q=False. That's 1 row out of 4."
+    },
+    {
+        "byte": 8,
+        "category": "Upper division",
+        "course": "COMP 322 — Operating Systems and System Architecture",
+        "title": "Deadlock conditions",
+        "type": "match_it",
+        "xp": 25,
+        "teaser": "All four must be present",
+        "mini_lecture": "Deadlock needs: mutual exclusion, hold and wait, no preemption, circular wait. All four must be present.",
+        "hint": "Match each behavior to its technical term.",
+        "content": {
+            "instruction": "Match each description to the deadlock condition",
+            "algorithms": [
+                "Only one process can use the printer",
+                "Process holds file A while requesting file B",
+                "OS cannot force release of resource",
+                "Process 1 waits for 2, Process 2 waits for 1",
+                "Process releases resources when done"
+            ],
+            "complexities": [
+                "Mutual exclusion",
+                "Hold and wait",
+                "No preemption",
+                "Circular wait",
+                "Not a deadlock condition"
+            ],
+            "correct": {
+                "0": 0,
+                "1": 1,
+                "2": 2,
+                "3": 3,
+                "4": 4
+            }
+        },
+        "explanation": "Mutual exclusion=can't share. Hold and wait=holding while requesting. No preemption=can't force release. Circular wait=circular chain. Voluntary release prevents deadlock."
+    },
+    {
+        "byte": 8,
+        "category": "Interview prep",
+        "course": "Interview prep",
+        "title": "Binary search: first occurrence",
+        "type": "trace_iter",
+        "xp": 30,
+        "teaser": "Find the first one",
+        "mini_lecture": "To find first occurrence: when target found, save position and keep searching left.",
+        "hint": "When you find target, don't return. Save index, move right=mid-1.",
+        "content": {
+            "code": "arr = [1, 2, 2, 2, 3, 4]\ntarget = 2\nleft=0, right=5, result=-1",
+            "question": "What is mid at each step?",
+            "iterations": [
+                {
+                    "label": "step 1: mid",
+                    "answer": "2"
+                },
+                {
+                    "label": "step 2: mid",
+                    "answer": "0"
+                },
+                {
+                    "label": "step 3: mid",
+                    "answer": "1"
+                }
+            ]
+        },
+        "explanation": "mid=2, found target, save result=2, search left. mid=0, arr[0]=1<2, left=1. mid=1, found target, save result=1. First occurrence at index 1."
+    },
+    {
+        "byte": 9,
+        "category": "Lower division",
+        "course": "COMP 110 — Introduction to Algorithms and Programming",
+        "title": "Nested loop output",
+        "type": "trace_iter",
+        "xp": 15,
+        "teaser": "Loop inside a loop",
+        "mini_lecture": "Inner loop runs completely for each outer iteration. 3 outer × 2 inner = 6 total.",
+        "hint": "For each i, inner loop runs all values of j. Track i*j.",
+        "content": {
+            "code": "for i in range(1, 4):\n    for j in range(1, 3):\n        print(i * j)",
+            "question": "What is printed each time?",
+            "iterations": [
+                {
+                    "label": "i=1, j=1",
+                    "answer": "1"
+                },
+                {
+                    "label": "i=1, j=2",
+                    "answer": "2"
+                },
+                {
+                    "label": "i=2, j=1",
+                    "answer": "2"
+                },
+                {
+                    "label": "i=2, j=2",
+                    "answer": "4"
+                },
+                {
+                    "label": "i=3, j=1",
+                    "answer": "3"
+                },
+                {
+                    "label": "i=3, j=2",
+                    "answer": "6"
+                }
+            ]
+        },
+        "explanation": "1×1=1, 1×2=2, 2×1=2, 2×2=4, 3×1=3, 3×2=6. Total 6 prints = 3×2."
+    },
+    {
+        "byte": 9,
+        "category": "Lower division",
+        "course": "COMP 182 — Data Structures and Program Design",
+        "title": "Min heap insert",
+        "type": "trace_iter",
+        "xp": 20,
+        "teaser": "Bubble it up",
+        "mini_lecture": "Min heap: parent smaller than children. New element goes at bottom, bubbles up by swapping with parent.",
+        "hint": "Parent index = (child-1)//2. Swap if child smaller than parent.",
+        "content": {
+            "code": "Heap: [3, 5, 8, 9, 7]\nInsert: 2",
+            "question": "Heap after each swap?",
+            "iterations": [
+                {
+                    "label": "after adding 2",
+                    "answer": "[3,5,8,9,7,2]"
+                },
+                {
+                    "label": "swap with 8",
+                    "answer": "[3,5,2,9,7,8]"
+                },
+                {
+                    "label": "swap with 3",
+                    "answer": "[2,5,3,9,7,8]"
+                }
+            ]
+        },
+        "explanation": "Add 2 at end. Parent of index 5 is 8 at index 2. 2<8, swap. Parent of index 2 is 3 at index 0. 2<3, swap. Now at root."
+    },
+    {
+        "byte": 9,
+        "category": "Upper division",
+        "course": "COMP 482 — Algorithm Design and Analysis",
+        "title": "Greedy coin change",
+        "type": "trace_iter",
+        "xp": 25,
+        "teaser": "Pick the biggest coin first",
+        "mini_lecture": "Greedy: always pick the largest coin that fits. Works for standard US coins.",
+        "hint": "Start with target. Use biggest coin possible, subtract, repeat.",
+        "content": {
+            "code": "Coins: [25, 10, 5, 1]\nTarget: 67 cents",
+            "question": "How many of each coin?",
+            "iterations": [
+                {
+                    "label": "25¢ coins",
+                    "answer": "2"
+                },
+                {
+                    "label": "remaining",
+                    "answer": "17"
+                },
+                {
+                    "label": "10¢ coins",
+                    "answer": "1"
+                },
+                {
+                    "label": "remaining",
+                    "answer": "7"
+                },
+                {
+                    "label": "5¢ coins",
+                    "answer": "1"
+                },
+                {
+                    "label": "1¢ coins",
+                    "answer": "2"
+                }
+            ]
+        },
+        "explanation": "67÷25=2(50¢), rem 17. 17÷10=1(10¢), rem 7. 7÷5=1(5¢), rem 2. 2×1¢. Total 6 coins."
+    },
+    {
+        "byte": 9,
+        "category": "Interview prep",
+        "course": "Interview prep",
+        "title": "Reverse a string",
+        "type": "sort_code",
+        "xp": 30,
+        "teaser": "Flip it with two pointers",
+        "mini_lecture": "Two pointers from both ends, swap and move inward. O(n) time, O(1) space on arrays.",
+        "hint": "Convert to list. Left and right pointers. Swap and move inward.",
+        "content": {
+            "instruction": "Arrange to reverse a string using two pointers",
+            "lines": [
+                "def reverse_string(s):",
+                "    chars = list(s)",
+                "    left, right = 0, len(chars) - 1",
+                "    while left < right:",
+                "        chars[left], chars[right] = chars[right], chars[left]",
+                "        left += 1",
+                "        right -= 1",
+                "    return ''.join(chars)"
+            ],
+            "correct_order": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+            ]
+        },
+        "explanation": "Convert to list, set pointers at ends, swap until they cross, join back to string."
+    },
+    {
+        "byte": 10,
+        "category": "Lower division",
+        "course": "COMP 122 — Computer Architecture and Assembly Language",
+        "title": "Memory addressing",
+        "type": "trace_iter",
+        "xp": 15,
+        "teaser": "Where does it live?",
+        "mini_lecture": "Array element address = base + (index × element_size). This is why array access is O(1).",
+        "hint": "Base=2000, each int=4 bytes. Element i is at 2000+(i×4).",
+        "content": {
+            "code": "int arr[5] = {10, 20, 30, 40, 50}\nBase: 2000, each int = 4 bytes",
+            "question": "Address of each element?",
+            "iterations": [
+                {
+                    "label": "arr[0]",
+                    "answer": "2000"
+                },
+                {
+                    "label": "arr[1]",
+                    "answer": "2004"
+                },
+                {
+                    "label": "arr[2]",
+                    "answer": "2008"
+                },
+                {
+                    "label": "arr[3]",
+                    "answer": "2012"
+                },
+                {
+                    "label": "arr[4]",
+                    "answer": "2016"
+                }
+            ]
+        },
+        "explanation": "arr[i] = 2000+(i×4). Direct arithmetic = O(1) access."
+    },
+    {
+        "byte": 10,
+        "category": "Lower division",
+        "course": "COMP 256 — Discrete Structures for Computer Science",
+        "title": "Proof by induction",
+        "type": "match_it",
+        "xp": 15,
+        "teaser": "Match the proof steps",
+        "mini_lecture": "Induction: prove base case (n=1), assume for n=k, prove for n=k+1. Like dominoes falling.",
+        "hint": "First domino = base case. One knocks down next = inductive step.",
+        "content": {
+            "instruction": "Match each description to the induction step",
+            "algorithms": [
+                "Show formula works for n=1",
+                "Assume formula works for n=k",
+                "Prove it works for n=k+1",
+                "Conclude it works for all n",
+                "State what to prove"
+            ],
+            "complexities": [
+                "Base case",
+                "Inductive hypothesis",
+                "Inductive step",
+                "Conclusion",
+                "Problem statement"
+            ],
+            "correct": {
+                "0": 0,
+                "1": 1,
+                "2": 2,
+                "3": 3,
+                "4": 4
+            }
+        },
+        "explanation": "Base case=verify n=1. Hypothesis=assume n=k. Step=prove n=k+1. Conclusion=all n. Statement=what we prove."
+    },
+    {
+        "byte": 10,
+        "category": "Upper division",
+        "course": "COMP 380 — Introduction to Software Engineering",
+        "title": "UML relationships",
+        "type": "match_it",
+        "xp": 25,
+        "teaser": "How do classes connect?",
+        "mini_lecture": "Inheritance=is-a. Composition=has-a, strong (part dies with whole). Aggregation=has-a, weak (part survives). Association=general link.",
+        "hint": "Can the part exist without the whole? No=composition. Yes=aggregation.",
+        "content": {
+            "instruction": "Match each example to the UML relationship",
+            "algorithms": [
+                "Car and Engine",
+                "University and Department",
+                "Library and Book",
+                "Dog and Animal",
+                "Student and Course"
+            ],
+            "complexities": [
+                "Composition",
+                "Composition",
+                "Aggregation",
+                "Inheritance",
+                "Association"
+            ],
+            "correct": {
+                "0": 0,
+                "1": 1,
+                "2": 2,
+                "3": 3,
+                "4": 4
+            }
+        },
+        "explanation": "Car-Engine=composition. University-Department=composition. Library-Book=aggregation. Dog-Animal=inheritance. Student-Course=association."
+    },
+    {
+        "byte": 10,
+        "category": "Interview prep",
+        "course": "Interview prep",
+        "title": "Recursion vs iteration",
+        "type": "spot_it",
+        "xp": 30,
+        "teaser": "Same result, different approach",
+        "mini_lecture": "Any recursion can be rewritten iteratively. Recursion uses call stack (O(n) space). Iteration uses loops (O(1) space).",
+        "hint": "Trace both with n=4. Compare space usage.",
+        "content": {
+            "question": "Both compute factorial. Which is TRUE?\n\ndef fact_r(n):\n    if n <= 1: return 1\n    return n * fact_r(n-1)\n\ndef fact_i(n):\n    result = 1\n    for i in range(2, n+1):\n        result *= i\n    return result",
+            "options": [
+                "fact_r uses O(n) stack space, fact_i uses O(1)",
+                "fact_r is faster than fact_i",
+                "They produce different results",
+                "fact_i uses more memory"
+            ],
+            "correct": 0
+        },
+        "explanation": "Both give same result. Recursive uses O(n) stack frames. Iterative uses O(1) extra space. Same time complexity O(n)."
     }
 ]
